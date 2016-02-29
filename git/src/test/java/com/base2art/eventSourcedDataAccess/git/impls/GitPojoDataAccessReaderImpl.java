@@ -1,6 +1,5 @@
 package com.base2art.eventSourcedDataAccess.git.impls;
 
-import com.base2art.eventSourcedDataAccess.extensions.DefaultOrderer;
 import com.base2art.eventSourcedDataAccess.git.GitContainer;
 import com.base2art.eventSourcedDataAccess.git.GitDataAccessConfiguration;
 import com.base2art.eventSourcedDataAccess.git.GitDataAccessReader;
