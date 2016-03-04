@@ -6,9 +6,9 @@ import com.base2art.eventSourcedDataAccess.impls.PojoDataAccessWriterBase;
 public class GitDataAccessWriter<Id, ObjectData, VersionObjectData>
         extends PojoDataAccessWriterBase<Id, ObjectData, VersionObjectData> {
 
-    private final GitWriter holder;
+    private final GitWriter<Id> holder;
 
-    public GitDataAccessWriter(final GitWriter holder) {
+    public GitDataAccessWriter(final GitWriter<Id> holder) {
         this.holder = holder;
     }
 

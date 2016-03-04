@@ -12,6 +12,7 @@
         <module>git</module>
         <module>memory</module>
         <module>testing</module>
+        <module>h2</module>
     </modules>
     <name>eventSourcedDataAccess-project</name>
 

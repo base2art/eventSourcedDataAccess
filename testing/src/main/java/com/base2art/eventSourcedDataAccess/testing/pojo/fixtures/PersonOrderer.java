@@ -15,15 +15,19 @@ public class PersonOrderer extends OrdererBase<Person, PersonOrderOptions> {
             case IdDesc:
                 return (y, x) -> x.getId().compareTo(y.getId());
             case NameAsc:
-                return (x, y) -> x.getName().compareTo(y.getName());
+                return (x, y) -> coalesce(x.getName()).compareTo(coalesce(y.getName()));
             case NameDesc:
-                return (y, x) -> x.getName().compareTo(y.getName());
+                return (y, x) -> coalesce(x.getName()).compareTo(coalesce(y.getName()));
             case SocialSecurityNumberAsc:
-                return (x, y) -> x.getSocialSecurityNumber().compareTo(y.getSocialSecurityNumber());
+                return (x, y) -> coalesce(x.getSocialSecurityNumber()).compareTo(coalesce(y.getSocialSecurityNumber()));
             case SocialSecurityNumberDesc:
-                return (y, x) -> x.getSocialSecurityNumber().compareTo(y.getSocialSecurityNumber());
+                return (y, x) -> coalesce(x.getSocialSecurityNumber()).compareTo(coalesce(y.getSocialSecurityNumber()));
         }
 
         return null;
+    }
+
+    private String coalesce(final String name) {
+        return name == null ? "" : name;
     }
 }

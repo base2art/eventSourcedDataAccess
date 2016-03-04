@@ -61,12 +61,17 @@ public abstract class PojoTestBase {
 
         PersonData pd = new PersonData();
         pd.setSocialSecurityNumber("123-00-7897");
-        PersonVersionData pvd = new PersonVersionData();
-        pvd.setName("SjY");
+        PersonVersionData pvd1 = new PersonVersionData();
+        PersonVersionData pvd2 = new PersonVersionData();
+        pvd1.setName("MjY");
 
         UUID id = UUID.randomUUID();
         writer.createObject(id, pd);
-        writer.insertVersion(id, pvd);
+        writer.insertVersion(id, pvd1);
+
+        pvd2.setName("SjY");
+        writer.insertVersion(id, pvd2);
+
 
         Person actual = getter.getService().getItem(id);
 

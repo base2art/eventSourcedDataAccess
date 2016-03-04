@@ -45,11 +45,8 @@ public abstract class PojoDataAccessReaderBase<Id, ObjectEntity, ObjectData, Ver
 
         Optional<VersionObjectData> versionObjectData = getVersionObjectDataById(id);
 
-        if (!versionObjectData.isPresent()) {
-            return null;
-        }
 
-        return this.creationFunction.apply(id, objectData.get(), versionObjectData.get());
+        return getObjectEntity(id, objectData, versionObjectData);
     }
 
     @Override
@@ -101,6 +98,19 @@ public abstract class PojoDataAccessReaderBase<Id, ObjectEntity, ObjectData, Ver
 
         return compileToArray(streamFilteredAndPaged(filterOptions, orderOptions, marker, pageSize));
     }
+
+    protected ObjectEntity getObjectEntity(
+            final Id id,
+            final Optional<ObjectData> objectData,
+            final Optional<VersionObjectData> versionObjectData) {
+
+        if (!versionObjectData.isPresent()) {
+            return null;
+        }
+
+        return this.creationFunction.apply(id, objectData.get(), versionObjectData.get());
+    }
+
 
     protected abstract Optional<ObjectData> getObjectDataById(Id id)
             throws DataAccessReaderException;
