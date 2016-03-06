@@ -65,13 +65,13 @@ public enum H2Type {
     }
 
     public void setParameter(PreparedStatement statement, int position, Object value)
-            throws DataAccessWriterException {
+            throws DataAccessReaderException {
 
         try {
             this.setParam.accept(statement, position, value);
         }
         catch (SQLException e) {
-            throw new DataAccessWriterException(e);
+            throw new DataAccessReaderException(e);
         }
     }
 

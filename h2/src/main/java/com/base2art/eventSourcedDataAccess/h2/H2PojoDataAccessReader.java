@@ -1,26 +1,20 @@
 package com.base2art.eventSourcedDataAccess.h2;
 
 import com.base2art.eventSourcedDataAccess.DataAccessReaderException;
-import com.base2art.eventSourcedDataAccess.DataAccessWriterException;
 import com.base2art.eventSourcedDataAccess.ObjectVersionFactory;
 import com.base2art.eventSourcedDataAccess.extensions.Filterer;
 import com.base2art.eventSourcedDataAccess.extensions.Orderer;
 import com.base2art.eventSourcedDataAccess.impls.PojoDataAccessReaderBase;
-import lombok.val;
 
-import java.lang.reflect.Field;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.stream.Stream;
 
+import static com.base2art.eventSourcedDataAccess.h2.H2Queries.fetchObjectMap;
+import static com.base2art.eventSourcedDataAccess.h2.H2Queries.fetchSingleObject;
 import static com.codepoetics.protonpack.StreamUtils.skipUntil;
 
 public abstract class H2PojoDataAccessReader<Id, ObjectEntity, ObjectData, VersionObjectData, FilterOptions, OrderOptions>
@@ -46,17 +40,63 @@ public abstract class H2PojoDataAccessReader<Id, ObjectEntity, ObjectData, Versi
 
     @Override
     public Stream<ObjectEntity> stream() throws DataAccessReaderException {
-        return this.createStream();
+
+        String sql = "SELECT * FROM " + this.connector.objectTable();
+
+        Map<Id, ObjectData> objectDatas = fetchObjectMap(
+                connector,
+                sql,
+                null,
+                this.connector.nonFinalObjectDataFields(),
+                this::createObjectData);
+
+        Id[] ids = objectDatas.keySet()
+                              .toArray(createGenericArray(this.connector.idType(), 0));
+
+
+        StringJoiner joiner = new StringJoiner(", ", "(", ")");
+        for (int i = 0; i < ids.length; i++) {
+            joiner.add("?");
+        }
+
+        String sqlVersion = "SELECT p1.*\n" +
+                            "FROM " + this.connector.objectVersionTable() + " p1" +
+                            "  LEFT JOIN " + this.connector.objectVersionTable() + " p2" +
+                            "     ON (p1.object_id = p2.object_id) AND (p1.OBJECT_VERSION_ID < p2.OBJECT_VERSION_ID)\n" +
+                            "WHERE p2.object_version_id IS NULL AND p1.object_id in " +
+                            joiner.toString();
+
+        H2Type type = this.connector.idH2Type();
+        Map<Id, VersionObjectData> versionObjectDatas = fetchObjectMap(
+                connector,
+                sqlVersion,
+                (stmt) -> {
+                    for (int i = 0; i < ids.length; i++) {
+                        type.setParameter(stmt, 1 + i, ids[i]);
+                    }
+                },
+                this.connector.nonFinalObjectVersionDataFields(),
+                this::createVersionObjectData);
+
+        List<ObjectEntity> items = new ArrayList<>();
+        for (Map.Entry<Id, ObjectData> pair : objectDatas.entrySet()) {
+            items.add(this.getObjectEntity(
+                    pair.getKey(),
+                    Optional.ofNullable(pair.getValue()),
+                    Optional.ofNullable(versionObjectDatas.getOrDefault(pair.getKey(), null))));
+        }
+
+        return items.stream();
     }
 
     @Override
     public Stream<ObjectEntity> streamFiltered(final FilterOptions filterOptions) throws DataAccessReaderException {
-        return filterEntities(this.createStream(), filterOptions);
+        return filterEntities(this.stream(), filterOptions);
     }
 
     @Override
     public Stream<ObjectEntity> streamPaged(final OrderOptions orderOptions, Id marker, int pageSize) throws DataAccessReaderException {
-        Stream<ObjectEntity> stream = this.createStream();
+        Stream<ObjectEntity> stream = this.stream();
         stream = orderEntities(stream, orderOptions);
         return pageEntities(stream, marker, pageSize);
     }
@@ -79,68 +119,30 @@ public abstract class H2PojoDataAccessReader<Id, ObjectEntity, ObjectData, Versi
     protected Optional<ObjectData> getObjectDataById(final Id id)
             throws DataAccessReaderException {
 
-        H2Type type = this.connector.idH2Type();
-        try (Connection connection = this.connector.openConnection()) {
-
-            String sql = "SELECT * FROM " + this.connector.objectTable() + " WHERE object_id = ?";
-            try (PreparedStatement statement = connection.prepareStatement(sql)) {
-
-                type.setParameter(statement, 1, id);
-
-                try (ResultSet set = statement.executeQuery()) {
-
-                    while (set.next()) {
-                        val objectData = this.createObjectData(id);
-                        this.populateData(this.connector.nonFinalObjectDataFields(), objectData, set);
-                        return Optional.of(objectData);
-                    }
-                }
-            }
-            catch (DataAccessWriterException e) {
-                throw new DataAccessReaderException(e);
-            }
-        }
-        catch (SQLException e) {
-            throw new DataAccessReaderException(e);
-        }
-
-        return Optional.empty();
+        return fetchSingleObject(
+                this.connector,
+                id,
+                "SELECT * FROM " + this.connector.objectTable() + " WHERE object_id = ?",
+                this.connector.nonFinalObjectDataFields(),
+                this::createObjectData);
     }
 
     @Override
     protected Optional<VersionObjectData> getVersionObjectDataById(final Id id) throws DataAccessReaderException {
 
+        String sqlVersion = "SELECT p1.*" +
+                            "  FROM " + this.connector.objectVersionTable() + " p1" +
+                            "    LEFT JOIN " + this.connector.objectVersionTable() + " p2" +
+                            "      ON (p1.object_id = p2.object_id) AND (p1.OBJECT_VERSION_ID < p2.OBJECT_VERSION_ID)\n" +
+                            "  WHERE p2.object_version_id IS NULL AND p1.object_id in (?);";
 
-        H2Type type = this.connector.idH2Type();
-        try (Connection connection = this.connector.openConnection()) {
 
-
-            String sqlVersion = "SELECT p1.*\n" +
-                                "FROM " + this.connector.objectVersionTable() + " p1" +
-                                "  LEFT JOIN " + this.connector.objectVersionTable() + " p2" +
-                                "     ON (p1.object_id = p2.object_id) AND (p1.OBJECT_VERSION_ID < p2.OBJECT_VERSION_ID)\n" +
-                                "WHERE p2.object_version_id IS NULL AND p1.object_id in (?);";
-            try (PreparedStatement statement = connection.prepareStatement(sqlVersion)) {
-
-                type.setParameter(statement, 1, id);
-
-                try (ResultSet set = statement.executeQuery()) {
-                    while (set.next()) {
-                        VersionObjectData objectData = this.createVersionObjectData(id);
-                        this.populateData(this.connector.nonFinalObjectVersionDataFields(), objectData, set);
-                        return Optional.of(objectData);
-                    }
-                }
-            }
-            catch (DataAccessWriterException e) {
-                throw new DataAccessReaderException(e);
-            }
-        }
-        catch (SQLException e) {
-            throw new DataAccessReaderException(e);
-        }
-
-        return Optional.empty();
+        return fetchSingleObject(
+                this.connector,
+                id,
+                sqlVersion,
+                this.connector.nonFinalObjectVersionDataFields(),
+                this::createVersionObjectData);
     }
 
     protected Stream<ObjectEntity> filterEntities(Stream<ObjectEntity> stream, FilterOptions options) {
@@ -175,92 +177,7 @@ public abstract class H2PojoDataAccessReader<Id, ObjectEntity, ObjectData, Versi
 
     protected abstract Id getIdForEntity(final ObjectEntity x);
 
-
-    private Stream<ObjectEntity> createStream() throws DataAccessReaderException {
-
-        Map<Id, ObjectData> objectDatas = new HashMap<>();
-        Map<Id, VersionObjectData> versionObjectDatas = new HashMap<>();
-
-        try (Connection connection = this.connector.openConnection()) {
-
-
-            H2Type type = this.connector.idH2Type();
-            String sql = "SELECT * FROM " + this.connector.objectTable();
-            try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                try (ResultSet set = statement.executeQuery()) {
-
-                    while (set.next()) {
-                        Id id = type.getParameter(set, "object_id");
-                        ObjectData objectData = this.createObjectData(id);
-                        this.populateData(connector.nonFinalObjectDataFields(), objectData, set);
-                        objectDatas.put(id, objectData);
-                    }
-                }
-            }
-
-
-            Id[] ids = objectDatas.keySet()
-                                  .toArray(createGenericArray(this.connector.idType(), 0));
-            StringJoiner joiner = new StringJoiner(", ", "(", ")");
-            for (int i = 0; i < ids.length; i++) {
-                joiner.add("?");
-            }
-
-            String sqlVersion = "SELECT p1.*\n" +
-                                "FROM " + this.connector.objectVersionTable() + " p1" +
-                                "  LEFT JOIN " + this.connector.objectVersionTable() + " p2" +
-                                "     ON (p1.object_id = p2.object_id) AND (p1.OBJECT_VERSION_ID < p2.OBJECT_VERSION_ID)\n" +
-                                "WHERE p2.object_version_id IS NULL AND p1.object_id in " +
-                                joiner.toString();
-            try (PreparedStatement statement = connection.prepareStatement(sqlVersion)) {
-
-                for (int i = 0; i < ids.length; i++) {
-                    type.setParameter(statement, 1 + i, ids[i]);
-                }
-
-                try (ResultSet set = statement.executeQuery()) {
-                    while (set.next()) {
-                        Id id = type.getParameter(set, "object_id");
-                        VersionObjectData objectData = this.createVersionObjectData(id);
-                        this.populateData(this.connector.nonFinalObjectVersionDataFields(), objectData, set);
-                        versionObjectDatas.put(id, objectData);
-                    }
-                }
-            }
-        }
-        catch (DataAccessWriterException | SQLException e) {
-            throw new DataAccessReaderException(e);
-        }
-
-        List<ObjectEntity> items = new ArrayList<>();
-        for (Map.Entry<Id, ObjectData> pair : objectDatas.entrySet()) {
-            items.add(this.getObjectEntity(
-                    pair.getKey(),
-                    Optional.ofNullable(pair.getValue()),
-                    Optional.ofNullable(versionObjectDatas.getOrDefault(pair.getKey(), null))));
-        }
-
-        return items.stream();
-    }
-
     protected abstract VersionObjectData createVersionObjectData(final Id id);
 
     protected abstract ObjectData createObjectData(final Id id);
-
-    protected <T> void populateData(
-            final List<Field> fields,
-            final T objectData,
-            final ResultSet set) throws DataAccessReaderException {
-
-        for (Field field : fields) {
-            H2Type type = this.connector.getTypeByField(field);
-            field.setAccessible(true);
-            try {
-                field.set(objectData, type.getParameter(set, field.getName()));
-            }
-            catch (IllegalAccessException | DataAccessReaderException e) {
-                throw new DataAccessReaderException(e);
-            }
-        }
-    }
 }

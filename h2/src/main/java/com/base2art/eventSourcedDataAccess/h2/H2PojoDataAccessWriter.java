@@ -1,5 +1,6 @@
 package com.base2art.eventSourcedDataAccess.h2;
 
+import com.base2art.eventSourcedDataAccess.DataAccessReaderException;
 import com.base2art.eventSourcedDataAccess.DataAccessWriterException;
 import com.base2art.eventSourcedDataAccess.impls.PojoDataAccessWriterBase;
 import lombok.Data;
@@ -136,7 +137,7 @@ public class H2PojoDataAccessWriter<Id, ObjectData, VersionObjectData>
 
             connection.commit();
         }
-        catch (IllegalAccessException | SQLException e) {
+        catch (IllegalAccessException | SQLException | DataAccessReaderException e) {
             throw new DataAccessWriterException(e);
         }
     }
