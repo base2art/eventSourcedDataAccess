@@ -1,8 +1,9 @@
 package com.base2art.eventSourcedDataAccess.h2;
 
 import com.base2art.eventSourcedDataAccess.DataAccessReaderException;
-import com.base2art.eventSourcedDataAccess.DataAccessWriterException;
+import com.base2art.eventSourcedDataAccess.h2.parameters.H2Type;
 import com.base2art.eventSourcedDataAccess.h2.utils.ParameterSetter;
+import lombok.val;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
@@ -31,7 +32,7 @@ public final class H2Queries {
 
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
 
-                H2Type type = connector.idH2Type();
+                val type = connector.idH2Type();
                 type.setParameter(statement, 1, id);
 
                 try (ResultSet set = statement.executeQuery()) {
@@ -64,7 +65,7 @@ public final class H2Queries {
 
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
 
-                H2Type type = connector.idH2Type();
+                val type = connector.idH2Type();
                 if (parameterSetter != null) {
                     parameterSetter.accept(statement);
                 }

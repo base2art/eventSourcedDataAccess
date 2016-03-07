@@ -1,20 +1,11 @@
 package com.base2art.eventSourcedDataAccess.testing.pojo.fixtures;
 
-import com.base2art.eventSourcedDataAccess.testing.pojo.EndsWithFilter;
+import com.base2art.eventSourcedDataAccess.filtering.TextField;
+import com.base2art.eventSourcedDataAccess.filtering.impls.DefaultTextField;
+import lombok.Data;
 
+@Data
 public class PersonFilterOptions {
-    private final EndsWithFilter endsWithFilter;
 
-    public PersonFilterOptions() {
-        this.endsWithFilter = null;
-    }
-
-    public PersonFilterOptions(final EndsWithFilter endsWithFilter) {
-
-        this.endsWithFilter = endsWithFilter;
-    }
-
-    public EndsWithFilter getEndsWithFilter() {
-        return endsWithFilter;
-    }
+    private final TextField socialSecurityNumber = new DefaultTextField();
 }

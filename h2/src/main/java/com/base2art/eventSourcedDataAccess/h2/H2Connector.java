@@ -1,5 +1,6 @@
 package com.base2art.eventSourcedDataAccess.h2;
 
+import com.base2art.eventSourcedDataAccess.h2.parameters.H2Type;
 import org.h2.jdbcx.JdbcConnectionPool;
 
 import java.lang.reflect.Field;
@@ -70,11 +71,11 @@ public class H2Connector<Id> {
     }
 
     public H2Type idH2Type() {
-        return this.getTypeByField(this.idType);
+        return H2TypeRegistrar.getTypeByField(this.idType);
     }
 
     public H2Type getTypeByField(final Field field) {
-        return this.getTypeByField(field.getType());
+        return H2TypeRegistrar.getTypeByField(field.getType());
     }
 
     public Class<Id> idType() {
@@ -101,7 +102,7 @@ public class H2Connector<Id> {
                 StringBuilder objectSql = new StringBuilder();
 
                 objectSql.append("CREATE TABLE IF NOT EXISTS ").append(this.objectTable()).append(" (").append("\n");
-                objectSql.append("  object_id " + this.idH2Type() + " NOT NULL").append("\n");
+                objectSql.append("  object_id " + this.idH2Type().getTypeName() + " NOT NULL").append("\n");
                 objectSql.append(")").append("\n");
                 objectStatement.executeUpdate(objectSql.toString());
             }
@@ -143,7 +144,6 @@ public class H2Connector<Id> {
             final String clazzName,
             final List<Field> fields) throws SQLException {
 
-
         for (Field field : fields) {
 
             try (Statement objectColumnStatement = connection.createStatement()) {
@@ -158,23 +158,6 @@ public class H2Connector<Id> {
                 throw new RuntimeException(e);
             }
         }
-
-    }
-
-    private H2Type getTypeByField(final Class<?> x) {
-        for (H2Type type : H2Type.values()) {
-            Class<?> primitiveType = type.getPrimitiveClass();
-            Class<?> nonPrimitiveType = type.getNonPrimitiveClass();
-            if (primitiveType != null && primitiveType == x) {
-                return type;
-            }
-
-            if (nonPrimitiveType != null && nonPrimitiveType == x) {
-                return type;
-            }
-        }
-
-        return H2Type.Other;
     }
 }
 

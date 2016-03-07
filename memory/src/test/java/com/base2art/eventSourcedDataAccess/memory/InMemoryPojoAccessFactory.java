@@ -61,6 +61,7 @@ public class InMemoryPojoAccessFactory implements PojoAccessorFactory {
 
     @Override
     public void destroy() {
-
+        objectDatas.clear();
+        versionObjectDatas.clear();
     }
 }

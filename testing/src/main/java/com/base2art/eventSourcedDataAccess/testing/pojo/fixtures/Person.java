@@ -1,32 +1,24 @@
 package com.base2art.eventSourcedDataAccess.testing.pojo.fixtures;
 
+import lombok.Getter;
 
 import java.util.UUID;
 
 public class Person {
 
-    private final UUID uuid;
+    @Getter
+    private final UUID id;
 
-    private final PersonData personData;
+    @Getter
+    private final String socialSecurityNumber;
 
-    private final PersonVersionData personVersionData;
+    @Getter
+    private final String name;
 
     public Person(final UUID uuid, final PersonData personData, final PersonVersionData personVersionData) {
 
-        this.uuid = uuid;
-        this.personData = personData;
-        this.personVersionData = personVersionData;
-    }
-
-    public String getSocialSecurityNumber() {
-        return this.personData.getSocialSecurityNumber();
-    }
-
-    public String getName() {
-        return this.personVersionData.getName();
-    }
-
-    public UUID getId() {
-        return uuid;
+        this.id = uuid;
+        this.socialSecurityNumber = personData.getSocialSecurityNumber();
+        this.name = personVersionData.getName();
     }
 }

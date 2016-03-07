@@ -29,13 +29,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public abstract class PojoTestBase {
 
-
     private PojoAccessorFactory pojoAccessFactory;
 
     private final List<PersonData> expectedPerson = new ArrayList<>();
     private final List<UUID> expectedIDs = new ArrayList<>();
     private final List<PersonVersionData> expectedVersion = new ArrayList<>();
-
 
     @Before
     public void beforeEach() {
@@ -51,7 +49,7 @@ public abstract class PojoTestBase {
     }
 
     @Test
-    public void canReadSingleItem() throws DataAccessReaderException, DataAccessWriterException {
+    public void canReadSingleItem() throws DataAccessReaderException, DataAccessWriterException, InterruptedException {
 
         ResultableService<ItemDataAccessReader<UUID, Person>> getter = this.tryGet(this::itemReader);
 
@@ -62,16 +60,17 @@ public abstract class PojoTestBase {
         PersonData pd = new PersonData();
         pd.setSocialSecurityNumber("123-00-7897");
         PersonVersionData pvd1 = new PersonVersionData();
-        PersonVersionData pvd2 = new PersonVersionData();
         pvd1.setName("MjY");
 
         UUID id = UUID.randomUUID();
         writer.createObject(id, pd);
         writer.insertVersion(id, pvd1);
 
+        // since we use millisecond based timeStamps we need a sleep in here.
+        Thread.sleep(2);
+        PersonVersionData pvd2 = new PersonVersionData();
         pvd2.setName("SjY");
         writer.insertVersion(id, pvd2);
-
 
         Person actual = getter.getService().getItem(id);
 
@@ -115,8 +114,9 @@ public abstract class PojoTestBase {
 
         setupData(expectedPerson, expectedVersion, expectedIDs, 250);
 
-        final Person[] filteredAndPaged = getter.getService().getFiltered(
-                new PersonFilterOptions(new EndsWithFilter("9")));
+        final PersonFilterOptions options = new PersonFilterOptions();
+        options.getSocialSecurityNumber().endsWith("9");
+        final Person[] filteredAndPaged = getter.getService().getFiltered(options);
         Arrays.sort(filteredAndPaged, (x, y) -> x.getName().compareTo(y.getName()));
         assertForNoMarker(filteredAndPaged, 25, "SjY1009", "SjY1249");
     }
@@ -168,7 +168,6 @@ public abstract class PojoTestBase {
     protected void resetData() {
         this.pojoAccessFactory = this.get();
     }
-
 
     protected void cleanData() {
         if (this.pojoAccessFactory != null) {
