@@ -2,7 +2,7 @@ package com.base2art.eventSourcedDataAccess.dataTypes;
 
 import lombok.Getter;
 
-public class DataTypeBase<T> implements DataType {
+public class DataTypeBase<T> implements DataType<T> {
 
     @Getter
     private final Class<T> primitiveClass;
