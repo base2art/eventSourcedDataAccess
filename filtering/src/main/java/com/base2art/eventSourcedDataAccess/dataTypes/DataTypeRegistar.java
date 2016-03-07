@@ -29,21 +29,21 @@ public class DataTypeRegistar {
 
     static {
         map = new ArrayList<>();
-        Integer = register(new DataTypeBase<>(int.class, Integer.class));
-        Boolean = register(new DataTypeBase<>(boolean.class, Boolean.class));
-        Byte = register(new DataTypeBase<>(byte.class, Byte.class));
-        Short = register(new DataTypeBase<>(short.class, Short.class));
-        Long = register(new DataTypeBase<>(long.class, Long.class));
-        Decimal = register(new DataTypeBase<>(null, BigDecimal.class));
-        Double = register(new DataTypeBase<>(double.class, Double.class));
-        Float = register(new DataTypeBase<>(float.class, Float.class));
-        LocalTime = register(new DataTypeBase<>(null, java.time.LocalTime.class));
-        LocalDate = register(new DataTypeBase<>(null, java.time.LocalDate.class));
-        Instant = register(new DataTypeBase<>(null, java.time.Instant.class));
-        Other = register(new DataTypeBase<>(null, null));
-        String = register(new DataTypeBase<>(null, String.class));
-        ByteArray = register(new DataTypeBase<>(null, byte[].class));
-        UUID = register(new DataTypeBase<>(null, java.util.UUID.class));
+        Integer = register(new DataTypeImpl<>(int.class, Integer.class));
+        Boolean = register(new DataTypeImpl<>(boolean.class, Boolean.class));
+        Byte = register(new DataTypeImpl<>(byte.class, Byte.class));
+        Short = register(new DataTypeImpl<>(short.class, Short.class));
+        Long = register(new DataTypeImpl<>(long.class, Long.class));
+        Decimal = register(new DataTypeImpl<>(null, BigDecimal.class));
+        Double = register(new DataTypeImpl<>(double.class, Double.class));
+        Float = register(new DataTypeImpl<>(float.class, Float.class));
+        LocalTime = register(new DataTypeImpl<>(null, java.time.LocalTime.class));
+        LocalDate = register(new DataTypeImpl<>(null, java.time.LocalDate.class));
+        Instant = register(new DataTypeImpl<>(null, java.time.Instant.class));
+        Other = register(new DataTypeImpl<>(null, null));
+        String = register(new DataTypeImpl<>(null, String.class));
+        ByteArray = register(new DataTypeImpl<>(null, byte[].class));
+        UUID = register(new DataTypeImpl<>(null, java.util.UUID.class));
     }
 
     public static DataType<?>[] values() {

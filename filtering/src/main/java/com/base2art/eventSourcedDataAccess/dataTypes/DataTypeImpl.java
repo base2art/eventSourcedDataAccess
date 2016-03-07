@@ -2,7 +2,7 @@ package com.base2art.eventSourcedDataAccess.dataTypes;
 
 import lombok.Getter;
 
-public class DataTypeBase<T> implements DataType<T> {
+public class DataTypeImpl<T> implements DataType<T> {
 
     @Getter
     private final Class<T> primitiveClass;
@@ -10,7 +10,7 @@ public class DataTypeBase<T> implements DataType<T> {
     @Getter
     private final Class<T> nonPrimitiveClass;
 
-    public DataTypeBase(
+    public DataTypeImpl(
             final Class<T> primitiveClass,
             final Class<T> nonPrimitiveClass) {
 
