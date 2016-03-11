@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 public class ShortH2Type extends H2TypeBase<Short> {
     public ShortH2Type() {
-        super("SMALLINT", short.class, Short.class);
+        super("SMALLINT");
     }
 
     @Override

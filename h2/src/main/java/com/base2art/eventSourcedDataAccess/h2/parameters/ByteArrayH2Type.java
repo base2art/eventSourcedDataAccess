@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 public class ByteArrayH2Type extends H2TypeBase<byte[]> {
     public ByteArrayH2Type() {
-        super("BLOB", null, byte[].class);
+        super("BLOB");
     }
 
     @Override

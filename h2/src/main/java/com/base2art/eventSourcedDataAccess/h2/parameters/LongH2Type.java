@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 public class LongH2Type extends H2TypeBase<Long> {
     public LongH2Type() {
-        super("BIGINT", long.class, Long.class);
+        super("BIGINT");
     }
 
     @Override

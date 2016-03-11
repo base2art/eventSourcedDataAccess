@@ -1,56 +1,45 @@
 package com.base2art.eventSourcedDataAccess.h2.parameters;
 
-import com.base2art.eventSourcedDataAccess.DataAccessReaderException;
 import lombok.Getter;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public abstract class H2TypeBase<T> implements H2Type {
+public abstract class H2TypeBase<Type> implements H2Type<Type> {
 
     @Getter
     private final String typeName;
 
-    @Getter
-    private final Class<T> primitiveClass;
-
-    @Getter
-    private final Class<T> nonPrimitiveClass;
-
-    public H2TypeBase(final String typeName, final Class<T> primitiveClass, final Class<T> nonPrimitiveClass) {
+    public H2TypeBase(final String typeName) {
         this.typeName = typeName;
-        this.primitiveClass = primitiveClass;
-        this.nonPrimitiveClass = nonPrimitiveClass;
     }
 
     @SuppressWarnings("unchecked")
     public void setParameter(PreparedStatement statement, int position, Object value)
-            throws DataAccessReaderException {
+            throws SQLException {
 
-        try {
-            this.setValue(statement, position, (T) value);
-        }
-        catch (SQLException e) {
-            throw new DataAccessReaderException(e);
-        }
+        this.setValue(statement, position, (Type) value);
+    }
+
+    public Type getParameter(final ResultSet resultSet, final String position)
+            throws SQLException {
+
+        return this.getValue(resultSet, position);
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T getParameter(final ResultSet resultSet, final String position)
-            throws DataAccessReaderException {
+    public <U> U getConvertedParameter(final ResultSet resultSet, final String position)
+            throws SQLException {
 
-        try {
-            return (T) this.getValue(resultSet, position);
-        }
-        catch (SQLException e) {
-            throw new DataAccessReaderException(e);
-        }
+        return (U) this.getValue(resultSet, position);
     }
 
-    public abstract T getValue(final ResultSet resultSet, final String pos)
+    @Override
+    public abstract Type getValue(final ResultSet resultSet, final String pos)
             throws SQLException;
 
-    public abstract void setValue(final PreparedStatement preparedStatement, final int pos, final T val)
+    @Override
+    public abstract void setValue(final PreparedStatement preparedStatement, final int pos, final Type val)
             throws SQLException;
 }

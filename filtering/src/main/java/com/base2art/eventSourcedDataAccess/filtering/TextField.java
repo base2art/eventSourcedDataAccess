@@ -10,9 +10,9 @@ public interface TextField extends ComparableField<String> {
 
     Optional<String> contains();
 
-    void matches(Pattern value);
-
-    Optional<Pattern> matches();
+//    void matches(Pattern value);
+//
+//    Optional<Pattern> matches();
 
     void endsWith(String ending);
 

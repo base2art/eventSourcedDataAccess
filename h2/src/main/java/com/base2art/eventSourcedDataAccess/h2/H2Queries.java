@@ -1,7 +1,7 @@
 package com.base2art.eventSourcedDataAccess.h2;
 
 import com.base2art.eventSourcedDataAccess.DataAccessReaderException;
-import com.base2art.eventSourcedDataAccess.h2.parameters.H2Type;
+import com.base2art.eventSourcedDataAccess.h2.parameters.RawH2Type;
 import com.base2art.eventSourcedDataAccess.h2.utils.ParameterSetter;
 import lombok.val;
 
@@ -73,7 +73,7 @@ public final class H2Queries {
                 try (ResultSet set = statement.executeQuery()) {
 
                     while (set.next()) {
-                        Id fetchedId = type.getParameter(set, "object_id");
+                        Id fetchedId = type.getConvertedParameter(set, "object_id");
                         T data = fetcher.apply(fetchedId);
                         populateData(connector, fields, data, set);
                         items.put(fetchedId, data);
@@ -92,15 +92,16 @@ public final class H2Queries {
             final H2Connector<Id> connector,
             final List<Field> fields,
             final T objectData,
-            final ResultSet set) throws DataAccessReaderException {
+            final ResultSet set) throws DataAccessReaderException, SQLException {
 
         for (Field field : fields) {
-            H2Type type = connector.getTypeByField(field);
+            RawH2Type type = connector.getTypeByField(field);
             field.setAccessible(true);
+
             try {
                 field.set(objectData, type.getParameter(set, field.getName()));
             }
-            catch (IllegalAccessException | DataAccessReaderException e) {
+            catch (IllegalAccessException e) {
                 throw new DataAccessReaderException(e);
             }
         }

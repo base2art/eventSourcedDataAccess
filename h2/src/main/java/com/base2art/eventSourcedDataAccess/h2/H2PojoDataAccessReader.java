@@ -3,7 +3,6 @@ package com.base2art.eventSourcedDataAccess.h2;
 import com.base2art.eventSourcedDataAccess.DataAccessReaderException;
 import com.base2art.eventSourcedDataAccess.ObjectVersionFactory;
 import com.base2art.eventSourcedDataAccess.h2.streamers.FilteredStreamer;
-import com.base2art.eventSourcedDataAccess.h2.streamers.PagedFilteredStreamer;
 import com.base2art.eventSourcedDataAccess.h2.streamers.PagedStreamer;
 import com.base2art.eventSourcedDataAccess.h2.streamers.Streamer;
 import com.base2art.eventSourcedDataAccess.impls.PojoDataAccessReaderBase;
@@ -63,7 +62,8 @@ public abstract class H2PojoDataAccessReader<Id, ObjectEntity, ObjectData, Versi
             final int pageSize)
             throws DataAccessReaderException {
 
-        return new PagedFilteredStreamer<>(this.connector, this, this).get(filterOptions, orderOptions, marker, pageSize);
+        return null;
+//        return new PagedFilteredStreamer<>(this.connector, this, this).get(filterOptions, orderOptions, marker, pageSize);
     }
 
     @Override

@@ -7,7 +7,7 @@ import java.sql.SQLException;
 
 public class DecimalH2Type extends H2TypeBase<BigDecimal> {
     public DecimalH2Type() {
-        super("DECIMAL", null, BigDecimal.class);
+        super("DECIMAL");
     }
 
     @Override

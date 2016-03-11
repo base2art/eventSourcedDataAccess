@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 public class IntH2Type extends H2TypeBase<Integer> {
     public IntH2Type() {
-        super("INT", int.class, Integer.class);
+        super("INT");
     }
 
     @Override

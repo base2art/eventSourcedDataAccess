@@ -1,6 +1,5 @@
 package com.base2art.eventSourcedDataAccess.h2;
 
-import com.base2art.eventSourcedDataAccess.DataAccessReaderException;
 import com.base2art.eventSourcedDataAccess.DataAccessWriterException;
 import lombok.val;
 
@@ -62,7 +61,7 @@ public final class H2Writes {
 
             connection.commit();
         }
-        catch (IllegalAccessException | SQLException | DataAccessReaderException e) {
+        catch (IllegalAccessException | SQLException e) {
             throw new DataAccessWriterException(e);
         }
     }

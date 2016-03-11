@@ -7,7 +7,7 @@ import java.sql.SQLException;
 public class ObjectH2Type extends H2TypeBase<Object> {
 
     public ObjectH2Type() {
-        super("OTHER", null, null);
+        super("OTHER");
     }
 
     @Override

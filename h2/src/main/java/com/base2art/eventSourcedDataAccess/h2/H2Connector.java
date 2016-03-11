@@ -1,6 +1,6 @@
 package com.base2art.eventSourcedDataAccess.h2;
 
-import com.base2art.eventSourcedDataAccess.h2.parameters.H2Type;
+import com.base2art.eventSourcedDataAccess.h2.parameters.RawH2Type;
 import org.h2.jdbcx.JdbcConnectionPool;
 
 import java.lang.reflect.Field;
@@ -70,11 +70,11 @@ public class H2Connector<Id> {
                                                   .collect(Collectors.toList());
     }
 
-    public H2Type idH2Type() {
+    public RawH2Type idH2Type() {
         return H2TypeRegistrar.getTypeByField(this.idType);
     }
 
-    public H2Type getTypeByField(final Field field) {
+    public RawH2Type getTypeByField(final Field field) {
         return H2TypeRegistrar.getTypeByField(field.getType());
     }
 

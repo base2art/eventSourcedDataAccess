@@ -7,7 +7,7 @@ import java.time.LocalDate;
 
 public class DateH2Type extends H2TypeBase<LocalDate> {
     public DateH2Type() {
-        super("DATE", null, LocalDate.class);
+        super("DATE");
     }
 
     @Override

@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 public class StringH2Type extends H2TypeBase<String> {
     public StringH2Type() {
-        super("VARCHAR_IGNORECASE(MAX)", null, String.class);
+        super("VARCHAR_IGNORECASE(MAX)");
     }
 
     @Override

@@ -7,7 +7,7 @@ import java.time.Instant;
 
 public class DateTimeH2Type extends H2TypeBase<Instant> {
     public DateTimeH2Type() {
-        super("TIMESTAMP", null, Instant.class);
+        super("TIMESTAMP");
     }
 
     @Override

@@ -7,7 +7,7 @@ import java.time.LocalTime;
 
 public class TimeH2Type extends H2TypeBase<LocalTime> {
     public TimeH2Type() {
-        super("TIME", null, LocalTime.class);
+        super("TIME");
     }
 
     @Override

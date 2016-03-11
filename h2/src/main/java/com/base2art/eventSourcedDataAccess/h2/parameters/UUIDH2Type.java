@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public class UUIDH2Type extends H2TypeBase<UUID> {
     public UUIDH2Type() {
-        super("UUID", null, java.util.UUID.class);
+        super("UUID");
     }
 
     @Override
@@ -16,7 +16,8 @@ public class UUIDH2Type extends H2TypeBase<UUID> {
     }
 
     @Override
-    public void setValue(final PreparedStatement preparedStatement, final int pos, final UUID val) throws SQLException {
+    public void setValue(final PreparedStatement preparedStatement, final int pos, final UUID val)
+            throws SQLException {
         preparedStatement.setObject(pos, val);
     }
 }

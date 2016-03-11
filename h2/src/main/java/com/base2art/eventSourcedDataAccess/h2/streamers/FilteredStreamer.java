@@ -4,11 +4,12 @@ import com.base2art.eventSourcedDataAccess.DataAccessReaderException;
 import com.base2art.eventSourcedDataAccess.EntityProducer;
 import com.base2art.eventSourcedDataAccess.h2.DataProducer;
 import com.base2art.eventSourcedDataAccess.h2.H2Connector;
+import com.base2art.eventSourcedDataAccess.h2.filters.H2ClauseCollection;
+import com.base2art.eventSourcedDataAccess.h2.sql.ResourceReader;
 import com.base2art.eventSourcedDataAccess.h2.utils.SqlBuilder;
 import lombok.val;
 
 import java.util.Map;
-import java.util.StringJoiner;
 import java.util.stream.Stream;
 
 import static com.base2art.eventSourcedDataAccess.h2.H2Queries.fetchObjectMap;
@@ -26,39 +27,33 @@ public class FilteredStreamer<Id, ObjectEntity, ObjectData, VersionObjectData, F
     public Stream<ObjectEntity> get(final FilterOptions filterOptions)
             throws DataAccessReaderException {
 
-        val versionJoiner = new StringJoiner(" AND ");
-        SqlBuilder.process(filterOptions, versionJoiner, this.getConnector().nonFinalObjectVersionDataFields());
-        val objectJoiner = new StringJoiner(" AND ");
-        SqlBuilder.process(filterOptions, objectJoiner, this.getConnector().nonFinalObjectDataFields());
+        val versionJoiner = new H2ClauseCollection();
+        SqlBuilder.process(filterOptions, "p2", this.getConnector().nonFinalObjectVersionDataFields(), versionJoiner);
+        val objectJoiner = new H2ClauseCollection();
+        SqlBuilder.process(filterOptions, "oq", this.getConnector().nonFinalObjectDataFields(), objectJoiner);
 
-        final String versionClause = versionJoiner.length() == 0 ? "" : " AND " + versionJoiner.toString();
-        final String objectClause = objectJoiner.length() == 0 ? "" : " AND " + objectJoiner.toString();
-        final String sqlVersion = "SELECT p1.object_id" +
-                                  "  FROM " + this.getConnector().objectVersionTable() + " p1" +
-                                  "    LEFT JOIN " + this.getConnector().objectVersionTable() + " p2" +
-                                  "      ON (p1.object_id = p2.object_id) AND (p1.OBJECT_VERSION_ID < p2.OBJECT_VERSION_ID)" +
-                                  "  WHERE p2.object_version_id IS NULL" +
-                                  versionClause;
-        String sql = "SELECT * FROM " + this.getConnector().objectTable() +
-                     "  WHERE object_id in (" + sqlVersion + ")" +
-                     objectClause;
+        final String versionClause = versionJoiner.length() == 0 ? "" : " AND " + versionJoiner.join(" AND ");
+        final String objectClause = objectJoiner.length() == 0 ? "" : " AND " + objectJoiner.join(" AND ");
+
+        String sql = ResourceReader.readStringUnchecked("/com/base2art/eventSourcedDataAccess/h2/sql/filtered.sql", this.getClass().getClassLoader());
+
+        sql = sql.replace("{objectTableName}", this.getConnector().objectTable())
+                 .replace("{objectVersionTableName}", this.getConnector().objectVersionTable())
+
+                 .replace("{objectClause}", objectClause)
+                 .replace("{objectVersionClause}", versionClause);
+
+        System.out.println(sql);
 
         Map<Id, ObjectData> objectDatas = fetchObjectMap(
                 this.getConnector(),
                 sql,
-                null,
+                (statement) -> {
+                    int counter = versionJoiner.setParameters(statement, 1);
+                    objectJoiner.setParameters(statement, counter);
+                },
                 this.getConnector().nonFinalObjectDataFields(),
                 this.producer()::createObjectData);
         return fetchAndMapVersionToEntity(objectDatas);
     }
-
-//
-//    protected Stream<ObjectEntity> filterEntities(Stream<ObjectEntity> stream, FilterOptions options) {
-//
-//        if (options == null) {
-//            return stream;
-//        }
-//
-//        return filterer.filter(stream, options);
-//    }
 }

@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 public class FloatH2Type extends H2TypeBase<Float> {
     public FloatH2Type() {
-        super("REAL", float.class, Float.class);
+        super("REAL");
     }
 
     @Override

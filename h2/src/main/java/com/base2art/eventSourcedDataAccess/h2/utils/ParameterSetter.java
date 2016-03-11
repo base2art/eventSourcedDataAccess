@@ -1,10 +1,9 @@
 package com.base2art.eventSourcedDataAccess.h2.utils;
 
-import com.base2art.eventSourcedDataAccess.DataAccessReaderException;
-
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 @FunctionalInterface
 public interface ParameterSetter {
-    void accept(PreparedStatement statement) throws DataAccessReaderException;
+    void accept(PreparedStatement statement) throws SQLException;
 }

@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 public class DoubleH2Type extends H2TypeBase<Double> {
     public DoubleH2Type() {
-        super("DOUBLE", double.class, Double.class);
+        super("DOUBLE");
     }
 
     @Override

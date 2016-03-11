@@ -1,20 +1,14 @@
 package com.base2art.eventSourcedDataAccess.h2.parameters;
 
-import com.base2art.eventSourcedDataAccess.DataAccessReaderException;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
-public interface H2Type {
-    Class<?> getPrimitiveClass();
+public interface H2Type<T> extends RawH2Type {
 
-    Class<?> getNonPrimitiveClass();
+    void setValue(PreparedStatement statement, int pos, T object)
+            throws SQLException;
 
-    String getTypeName();
-
-    void setParameter(PreparedStatement statement, int pos, Object object)
-            throws DataAccessReaderException;
-
-    <T> T getParameter(final ResultSet resultSet, final String position)
-            throws DataAccessReaderException;
+    T getValue(final ResultSet resultSet, final String position)
+            throws SQLException;
 }

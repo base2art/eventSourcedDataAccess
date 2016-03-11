@@ -4,7 +4,7 @@ import com.base2art.eventSourcedDataAccess.DataAccessReaderException;
 import com.base2art.eventSourcedDataAccess.EntityProducer;
 import com.base2art.eventSourcedDataAccess.h2.DataProducer;
 import com.base2art.eventSourcedDataAccess.h2.H2Connector;
-import com.base2art.eventSourcedDataAccess.h2.parameters.H2Type;
+import com.base2art.eventSourcedDataAccess.h2.parameters.RawH2Type;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +59,7 @@ public class StreamerBase<Id, ObjectEntity, ObjectData, VersionObjectData> {
                             "WHERE p2.object_version_id IS NULL AND p1.object_id in " +
                             joiner.toString();
 
-        H2Type type = this.connector.idH2Type();
+        RawH2Type type = this.connector.idH2Type();
         Map<Id, VersionObjectData> versionObjectDatas = fetchObjectMap(
                 connector,
                 sqlVersion,

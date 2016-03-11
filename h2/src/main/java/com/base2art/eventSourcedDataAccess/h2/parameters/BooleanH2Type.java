@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 public class BooleanH2Type extends H2TypeBase<Boolean> {
     public BooleanH2Type() {
-        super("BOOLEAN", boolean.class, Boolean.class);
+        super("BOOLEAN");
     }
 
     @Override

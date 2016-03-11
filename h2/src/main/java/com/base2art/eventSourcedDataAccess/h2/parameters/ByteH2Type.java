@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 public class ByteH2Type extends H2TypeBase<Byte> {
     public ByteH2Type() {
-        super("TINYINT", byte.class, Byte.class);
+        super("TINYINT");
     }
 
     @Override

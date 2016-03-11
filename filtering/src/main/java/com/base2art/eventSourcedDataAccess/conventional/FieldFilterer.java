@@ -1,8 +1,8 @@
 package com.base2art.eventSourcedDataAccess.conventional;
 
 import com.base2art.eventSourcedDataAccess.StreamFilterer;
-import com.base2art.eventSourcedDataAccess.filtering.dataTypes.MemoryFilterRegistar;
-import com.base2art.eventSourcedDataAccess.filtering.dataTypes.DataFilter;
+import com.base2art.eventSourcedDataAccess.filtering.memory.MemoryFilterRegistar;
+import com.base2art.eventSourcedDataAccess.filtering.memory.RawDataFilter;
 import com.base2art.eventSourcedDataAccess.filtering.utils.FilterReader;
 import com.base2art.eventSourcedDataAccess.utils.Reflection;
 
@@ -42,7 +42,7 @@ public class FieldFilterer<ObjectEntity, FilterOptions>
                             continue;
                         }
 
-                        DataFilter<?> dataFilter = MemoryFilterRegistar.getFilter(obj.getClass());
+                        RawDataFilter dataFilter = MemoryFilterRegistar.getFilter(obj.getClass());
                         if (dataFilter == null) {
                             continue;
                         }
