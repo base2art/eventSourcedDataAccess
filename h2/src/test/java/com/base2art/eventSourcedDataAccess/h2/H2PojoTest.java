@@ -13,15 +13,9 @@ public class H2PojoTest extends PojoTestBase {
         return new H2PojoAccessFactory();
     }
 
-    @Override
-    @Ignore("Suppressing while testing from command line")
-    public void canReadManyItemsPaged() throws DataAccessReaderException, DataAccessWriterException {
-//        super.canReadManyItemsPaged();
-    }
-
-    @Override
-    @Ignore("Suppressing while testing from command line")
-    public void canReadManyItemsFilteredAndPaged() throws DataAccessReaderException, DataAccessWriterException {
-//        super.canReadManyItemsFilteredAndPaged();
-    }
+//    @Override
+//    @Ignore("Suppressing while testing from command line")
+//    public void canReadManyItemsFilteredAndPaged() throws DataAccessReaderException, DataAccessWriterException {
+////        super.canReadManyItemsFilteredAndPaged();
+//    }
 }

@@ -11,6 +11,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -60,18 +61,18 @@ public final class H2Queries {
             final Function<Id, T> fetcher)
             throws DataAccessReaderException {
 
-        Map<Id, T> items = new HashMap<>();
+        Map<Id, T> items = new LinkedHashMap<>();
         try (Connection connection = connector.openConnection()) {
 
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
 
-                val type = connector.idH2Type();
                 if (parameterSetter != null) {
                     parameterSetter.accept(statement);
                 }
 
                 try (ResultSet set = statement.executeQuery()) {
 
+                    val type = connector.idH2Type();
                     while (set.next()) {
                         Id fetchedId = type.getConvertedParameter(set, "object_id");
                         T data = fetcher.apply(fetchedId);

@@ -25,7 +25,7 @@ public class ResourceReader {
         }
     }
 
-    public byte[] readBytesUnchecked(String fileName, ClassLoader loader) {
+    public static byte[] readBytesUnchecked(String fileName, ClassLoader loader) {
 
         try {
             return readBytes(fileName, loader);
@@ -35,7 +35,7 @@ public class ResourceReader {
         }
     }
 
-    public String readString(String fileName, ClassLoader loader) throws URISyntaxException, IOException {
+    public static String readString(String fileName, ClassLoader loader) throws URISyntaxException, IOException {
 
         //Get file from resources folder
         URI uri = getResourceUrl(fileName, loader).toURI();
@@ -45,7 +45,7 @@ public class ResourceReader {
         return String.join(System.lineSeparator(), lines);
     }
 
-    public byte[] readBytes(String fileName, ClassLoader loader) throws URISyntaxException, IOException {
+    public static byte[] readBytes(String fileName, ClassLoader loader) throws URISyntaxException, IOException {
 
         //Get file from resources folder
         URI uri = getResourceUrl(fileName, loader).toURI();
@@ -53,8 +53,10 @@ public class ResourceReader {
         return Files.readAllBytes(Paths.get(uri));
     }
 
-    private URL getResourceUrl(final String fileName, final ClassLoader loader) {
-        val url = loader.getResource(fileName);
+    private static URL getResourceUrl(final String fileName, final ClassLoader loader) {
+
+//        val url = loader.getResource(fileName);
+        val url = ResourceReader.class.getResource(fileName);
         if (url == null) {
             throw new IllegalStateException("Resource does not exist: " + fileName);
         }

@@ -28,6 +28,7 @@ public class H2PojoAccessFactory implements PojoAccessorFactory {
         try {
 
             this.file = File.createTempFile("test", ".h2");
+            System.out.println(this.file.getAbsolutePath());
 //            val debugFile = new File("/Users/syoungblut/test2");
             this.connector = new H2Connector<>(
                     file.getAbsolutePath(),

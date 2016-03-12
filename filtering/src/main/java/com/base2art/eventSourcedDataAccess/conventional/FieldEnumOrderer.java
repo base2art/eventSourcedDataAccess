@@ -1,15 +1,15 @@
 package com.base2art.eventSourcedDataAccess.conventional;
 
+import com.base2art.eventSourcedDataAccess.EnumSortParser;
 import com.base2art.eventSourcedDataAccess.StreamOrderer;
 import com.base2art.eventSourcedDataAccess.utils.Reflection;
+import lombok.val;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class FieldEnumOrderer<ObjectEntity, OrderOptions>
+public class FieldEnumOrderer<ObjectEntity, OrderOptions extends Enum<OrderOptions>>
         implements StreamOrderer<ObjectEntity, OrderOptions> {
 
     private final Class<ObjectEntity> entityClass;
@@ -22,29 +22,10 @@ public class FieldEnumOrderer<ObjectEntity, OrderOptions>
     public Stream<ObjectEntity> order(final Stream<ObjectEntity> stream, final OrderOptions orderOptions) {
         if (orderOptions.getClass().isEnum()) {
 
-            String fieldName = orderOptions.toString();
-
-            boolean asc = true;
-            Map<String, Boolean> items = new HashMap<>();
-
-            items.put("ASC", true);
-            items.put("ASCENDING", true);
-            items.put("DESCENDING", false);
-            items.put("DESC", false);
-
-            for (Map.Entry<String, Boolean> entry : items.entrySet()) {
-
-                if (fieldName.toUpperCase().endsWith(entry.getKey())) {
-                    asc = true;
-                    fieldName = fieldName.substring(0, fieldName.length() - entry.getKey().length());
-                    break;
-                }
-            }
-
-            final String newFieldName = fieldName;
+            val sortInformation = EnumSortParser.parse(orderOptions);
 
             Optional<Field> field = Reflection.fields(this.entityClass)
-                                              .filter(x -> x.getName().equalsIgnoreCase(newFieldName))
+                                              .filter(x -> x.getName().equalsIgnoreCase(sortInformation.getFieldName()))
                                               .findFirst();
 
             if (!field.isPresent()) {
@@ -53,7 +34,7 @@ public class FieldEnumOrderer<ObjectEntity, OrderOptions>
 
             final Field fieldObj = field.get();
 
-            final boolean isAscending = asc;
+            final boolean isAscending = sortInformation.isAscending();
             fieldObj.setAccessible(true);
             return stream.sorted((o1, o2) -> isAscending ? compareItem(o1, o2, fieldObj) : compareItem(o2, o1, fieldObj));
         }

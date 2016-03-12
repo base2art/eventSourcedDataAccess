@@ -122,7 +122,26 @@ public abstract class PojoTestBase {
     }
 
     @Test
-    public void canReadManyItemsPaged() throws DataAccessReaderException, DataAccessWriterException {
+    public void canReadManyItemsPaged_ObjectSort() throws DataAccessReaderException, DataAccessWriterException {
+
+        ResultableService<PagedDataAccessReader<UUID, Person, PersonOrderOptions>> getter = this.tryGet(this::pagedSetReader);
+
+        org.junit.Assume.assumeTrue(!getter.hasError());
+
+        setupData(expectedPerson, expectedVersion, expectedIDs, 25);
+
+        final Person[] filteredAndPaged = getter.getService().getPaged(
+                PersonOrderOptions.SocialSecurityNumberAsc, null, 10);
+        assertForNoMarker(filteredAndPaged, 10, "SjY1000", "SjY1009");
+
+        final Person[] filteredAndPagedPage1 = getter.getService().getPaged(
+                PersonOrderOptions.SocialSecurityNumberAsc, lastId(filteredAndPaged), 10);
+
+        assertForNoMarker(filteredAndPagedPage1, 10, "SjY1010", "SjY1019");
+    }
+
+    @Test
+    public void canReadManyItemsPaged_ObjectVersionSort() throws DataAccessReaderException, DataAccessWriterException {
 
         ResultableService<PagedDataAccessReader<UUID, Person, PersonOrderOptions>> getter = this.tryGet(this::pagedSetReader);
 
@@ -141,7 +160,7 @@ public abstract class PojoTestBase {
     }
 
     @Test
-    public void canReadManyItemsFilteredAndPaged() throws DataAccessReaderException, DataAccessWriterException {
+    public void canReadManyItemsFilteredAndPaged_ObjectVersionSort() throws DataAccessReaderException, DataAccessWriterException {
 
         ResultableService<FilteredPagedDataAccessReader<UUID, Person, PersonFilterOptions, PersonOrderOptions>> getter
                 = tryGet(this::filteredPagedSetReader);
@@ -157,6 +176,29 @@ public abstract class PojoTestBase {
         final Person[] filteredAndPagedPage1 = getter.getService().getFilteredAndPaged(
                 new PersonFilterOptions(),
                 PersonOrderOptions.NameAsc,
+                filteredAndPaged[filteredAndPaged.length - 1].getId(),
+                10);
+
+        assertForNoMarker(filteredAndPagedPage1, 10, "SjY1010", "SjY1019");
+    }
+
+    @Test
+    public void canReadManyItemsFilteredAndPaged_ObjectSort() throws DataAccessReaderException, DataAccessWriterException {
+
+        ResultableService<FilteredPagedDataAccessReader<UUID, Person, PersonFilterOptions, PersonOrderOptions>> getter
+                = tryGet(this::filteredPagedSetReader);
+
+        org.junit.Assume.assumeTrue(!getter.hasError());
+
+        setupData(expectedPerson, expectedVersion, expectedIDs, 25);
+
+        final Person[] filteredAndPaged = getter.getService().getFilteredAndPaged(
+                new PersonFilterOptions(), PersonOrderOptions.SocialSecurityNumberAsc, null, 10);
+        assertForNoMarker(filteredAndPaged, 10, "SjY1000", "SjY1009");
+
+        final Person[] filteredAndPagedPage1 = getter.getService().getFilteredAndPaged(
+                new PersonFilterOptions(),
+                PersonOrderOptions.SocialSecurityNumberAsc,
                 filteredAndPaged[filteredAndPaged.length - 1].getId(),
                 10);
 
