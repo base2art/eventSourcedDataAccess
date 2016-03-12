@@ -1,8 +1,8 @@
 package com.base2art.eventSourcedDataAccess.memory;
 
 import com.base2art.eventSourcedDataAccess.DataAccessReaderException;
-import com.base2art.eventSourcedDataAccess.StreamFilterer;
 import com.base2art.eventSourcedDataAccess.ObjectVersionFactory;
+import com.base2art.eventSourcedDataAccess.StreamFilterer;
 import com.base2art.eventSourcedDataAccess.StreamOrderer;
 import com.base2art.eventSourcedDataAccess.impls.PojoDataAccessReaderBase;
 import com.google.common.collect.Multimap;
@@ -126,6 +126,7 @@ public abstract class InMemoryPojoDataAccessReader<Id, ObjectEntity, ObjectData,
 
         return this.objectData.entrySet()
                               .stream()
+                              .filter(x -> !x.getValue().isArchived())
                               .map(x -> {
                                   try {
                                       return getItem(x.getKey());

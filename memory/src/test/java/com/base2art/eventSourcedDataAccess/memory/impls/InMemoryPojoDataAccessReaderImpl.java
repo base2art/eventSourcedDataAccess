@@ -1,10 +1,10 @@
 package com.base2art.eventSourcedDataAccess.memory.impls;
 
+import com.base2art.eventSourcedDataAccess.conventional.FieldEnumOrderer;
+import com.base2art.eventSourcedDataAccess.conventional.FieldFilterer;
 import com.base2art.eventSourcedDataAccess.memory.Archivable;
 import com.base2art.eventSourcedDataAccess.memory.InMemoryPojoDataAccessReader;
 import com.base2art.eventSourcedDataAccess.memory.TimeStamped;
-import com.base2art.eventSourcedDataAccess.conventional.FieldFilterer;
-import com.base2art.eventSourcedDataAccess.conventional.FieldEnumOrderer;
 import com.base2art.eventSourcedDataAccess.testing.pojo.fixtures.Person;
 import com.base2art.eventSourcedDataAccess.testing.pojo.fixtures.PersonData;
 import com.base2art.eventSourcedDataAccess.testing.pojo.fixtures.PersonFilterOptions;

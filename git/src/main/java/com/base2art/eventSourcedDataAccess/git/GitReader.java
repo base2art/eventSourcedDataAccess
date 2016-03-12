@@ -46,11 +46,15 @@ public class GitReader<Id> {
         try {
             File objectContainer = container.get(id, true);
 
-
             File objectData = new File(objectContainer, ".meta");
 
-            return mapper.readValue(objectData, objectDataType);
+            File archivedSignal = new File(objectContainer, ".archived");
 
+            if (archivedSignal.exists()) {
+                return null;
+            }
+
+            return mapper.readValue(objectData, objectDataType);
         }
 
         catch (IOException | DataAccessWriterException e) {
@@ -63,7 +67,6 @@ public class GitReader<Id> {
 
         try {
             File objectContainer = container.get(id, true);
-
 
             File[] items = objectContainer.listFiles((x) -> !x.getName().startsWith(".") && x.isFile());
             if (items.length == 0) {

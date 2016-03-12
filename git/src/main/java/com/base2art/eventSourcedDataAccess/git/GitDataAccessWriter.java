@@ -2,6 +2,7 @@ package com.base2art.eventSourcedDataAccess.git;
 
 import com.base2art.eventSourcedDataAccess.DataAccessWriterException;
 import com.base2art.eventSourcedDataAccess.impls.PojoDataAccessWriterBase;
+import lombok.Data;
 
 public class GitDataAccessWriter<Id, ObjectData, VersionObjectData>
         extends PojoDataAccessWriterBase<Id, ObjectData, VersionObjectData> {
@@ -40,10 +41,15 @@ public class GitDataAccessWriter<Id, ObjectData, VersionObjectData>
     @Override
     protected void archiveObjectInternal(final Id id) throws DataAccessWriterException {
 
-        holder.<Object>writeObject(id, ".archived", new Object());
+        holder.writeObject(id, ".archived", new SerialiableObject());
     }
 
     protected String versionId(final VersionObjectData version) {
         return String.valueOf(System.currentTimeMillis());
+    }
+
+    @Data
+    private class SerialiableObject {
+        private boolean isArchived = true;
     }
 }

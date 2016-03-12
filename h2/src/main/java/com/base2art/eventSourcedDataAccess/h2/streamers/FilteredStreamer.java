@@ -9,10 +9,7 @@ import com.base2art.eventSourcedDataAccess.h2.filters.H2ClauseCollection;
 import com.base2art.eventSourcedDataAccess.h2.utils.SqlBuilder;
 import lombok.val;
 
-import java.util.Map;
 import java.util.stream.Stream;
-
-import static com.base2art.eventSourcedDataAccess.h2.H2Queries.fetchObjectMap;
 
 public class FilteredStreamer<Id, ObjectEntity, ObjectData, VersionObjectData, FilterOptions>
         extends StreamerBase<Id, ObjectEntity, ObjectData, VersionObjectData> {
@@ -27,24 +24,13 @@ public class FilteredStreamer<Id, ObjectEntity, ObjectData, VersionObjectData, F
     public Stream<ObjectEntity> get(final FilterOptions filterOptions)
             throws DataAccessReaderException {
 
-        val versionJoiner = new H2ClauseCollection();
-        SqlBuilder.process(filterOptions, "p2", this.getConnector().nonFinalObjectVersionDataFields(), versionJoiner);
         val objectJoiner = new H2ClauseCollection();
-        SqlBuilder.process(filterOptions, "oq", this.getConnector().nonFinalObjectDataFields(), objectJoiner);
+        SqlBuilder.process(filterOptions, "ot", this.getConnector().nonFinalObjectDataFields(), objectJoiner);
+        val versionJoiner = new H2ClauseCollection();
+        SqlBuilder.process(filterOptions, "p1", this.getConnector().nonFinalObjectVersionDataFields(), versionJoiner);
 
         String sql = Sql.filtered(this.getConnector(), objectJoiner, versionJoiner);
 
-//        System.out.println(sql);
-
-        Map<Id, ObjectData> objectDatas = fetchObjectMap(
-                this.getConnector(),
-                sql,
-                (statement) -> {
-                    int counter = versionJoiner.setParameters(statement, 1);
-                    objectJoiner.setParameters(statement, counter);
-                },
-                this.getConnector().nonFinalObjectDataFields(),
-                this.producer()::createObjectData);
-        return fetchAndMapVersionToEntity(objectDatas);
+        return getObjectEntityStream(null, Integer.MAX_VALUE, objectJoiner, versionJoiner, sql);
     }
 }

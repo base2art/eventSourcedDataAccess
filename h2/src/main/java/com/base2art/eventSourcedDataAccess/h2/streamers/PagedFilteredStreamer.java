@@ -10,10 +10,7 @@ import com.base2art.eventSourcedDataAccess.h2.filters.H2ClauseCollection;
 import com.base2art.eventSourcedDataAccess.h2.utils.SqlBuilder;
 import lombok.val;
 
-import java.util.Map;
 import java.util.stream.Stream;
-
-import static com.base2art.eventSourcedDataAccess.h2.H2Queries.fetchObjectMap;
 
 public class PagedFilteredStreamer<Id, ObjectEntity, ObjectData, VersionObjectData, FilterOptions, OrderOptions>
         extends StreamerBase<Id, ObjectEntity, ObjectData, VersionObjectData> {
@@ -35,6 +32,7 @@ public class PagedFilteredStreamer<Id, ObjectEntity, ObjectData, VersionObjectDa
         val sortInformation = EnumSortParser.parse((Enum) orderOptions);
 
         val objectFields = this.getConnector().nonFinalObjectDataFields();
+        val versionFields = this.getConnector().nonFinalObjectVersionDataFields();
 
         final String sortField = sortInformation.getFieldName();
 
@@ -42,35 +40,10 @@ public class PagedFilteredStreamer<Id, ObjectEntity, ObjectData, VersionObjectDa
         SqlBuilder.process(filterOptions, "ot", objectFields, objectJoiner);
 
         val versionJoiner = new H2ClauseCollection();
-        SqlBuilder.process(filterOptions, "p1", this.getConnector().nonFinalObjectVersionDataFields(), versionJoiner);
+        SqlBuilder.process(filterOptions, "p1", versionFields, versionJoiner);
 
-        String sql = Sql.paged(getConnector(), marker, objectFields, sortField, sortInformation.isAscending(), objectJoiner, versionJoiner);
+        String sql = Sql.paged(getConnector(), marker, sortField, sortInformation.isAscending(), objectJoiner, versionJoiner);
 
-        if (marker != null) {
-            System.out.println(sql);
-        }
-
-        Map<Id, ObjectData> objectDatas = fetchObjectMap(
-                this.getConnector(),
-                sql,
-                (statement) -> {
-                    if (marker == null) {
-                        int counter = versionJoiner.setParameters(statement, 1);
-                        counter = objectJoiner.setParameters(statement, counter);
-                        statement.setInt(counter, pageSize);
-                    }
-                    else {
-
-                        int counter = versionJoiner.setParameters(statement, 1);
-                        counter = objectJoiner.setParameters(statement, counter);
-                        counter = versionJoiner.setParameters(statement, counter);
-                        counter = objectJoiner.setParameters(statement, counter);
-                        getConnector().idH2Type().setParameter(statement, counter, marker);
-                        statement.setInt(counter + 1, pageSize);
-                    }
-                },
-                objectFields,
-                this.producer()::createObjectData);
-        return fetchAndMapVersionToEntity(objectDatas);
+        return getObjectEntityStream(marker, pageSize, objectJoiner, versionJoiner, sql);
     }
 }

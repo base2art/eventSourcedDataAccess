@@ -48,9 +48,6 @@ public abstract class H2PojoDataAccessReader<Id, ObjectEntity, ObjectData, Versi
 
     @Override
     public Stream<ObjectEntity> streamPaged(final OrderOptions orderOptions, Id marker, int pageSize) throws DataAccessReaderException {
-//        Stream<ObjectEntity> stream = this.stream();
-//        stream = orderEntities(stream, orderOptions);
-//        return pageEntities(stream, marker, pageSize);
 
         return new PagedStreamer<>(this.connector, this, this).get(orderOptions, marker, pageSize);
     }
