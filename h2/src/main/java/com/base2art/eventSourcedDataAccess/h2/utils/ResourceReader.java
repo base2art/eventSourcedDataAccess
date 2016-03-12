@@ -1,4 +1,4 @@
-package com.base2art.eventSourcedDataAccess.h2.sql;
+package com.base2art.eventSourcedDataAccess.h2.utils;
 
 import lombok.experimental.UtilityClass;
 import lombok.val;

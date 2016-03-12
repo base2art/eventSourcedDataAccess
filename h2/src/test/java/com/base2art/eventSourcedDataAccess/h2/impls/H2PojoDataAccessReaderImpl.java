@@ -29,11 +29,6 @@ public class H2PojoDataAccessReaderImpl
     }
 
     @Override
-    protected UUID getIdForEntity(final Person x) {
-        return x.getId();
-    }
-
-    @Override
     public PersonVersionData createVersionObjectData(final UUID uuid) {
         return new PersonVersionData();
     }

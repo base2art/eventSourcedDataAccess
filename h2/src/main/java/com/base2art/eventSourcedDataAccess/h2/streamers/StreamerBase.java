@@ -6,6 +6,7 @@ import com.base2art.eventSourcedDataAccess.h2.DataProducer;
 import com.base2art.eventSourcedDataAccess.h2.H2Connector;
 import com.base2art.eventSourcedDataAccess.h2.parameters.RawH2Type;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

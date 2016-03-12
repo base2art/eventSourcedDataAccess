@@ -3,6 +3,7 @@ package com.base2art.eventSourcedDataAccess.h2;
 import com.base2art.eventSourcedDataAccess.DataAccessReaderException;
 import com.base2art.eventSourcedDataAccess.ObjectVersionFactory;
 import com.base2art.eventSourcedDataAccess.h2.streamers.FilteredStreamer;
+import com.base2art.eventSourcedDataAccess.h2.streamers.PagedFilteredStreamer;
 import com.base2art.eventSourcedDataAccess.h2.streamers.PagedStreamer;
 import com.base2art.eventSourcedDataAccess.h2.streamers.Streamer;
 import com.base2art.eventSourcedDataAccess.impls.PojoDataAccessReaderBase;
@@ -62,8 +63,7 @@ public abstract class H2PojoDataAccessReader<Id, ObjectEntity, ObjectData, Versi
             final int pageSize)
             throws DataAccessReaderException {
 
-        return null;
-//        return new PagedFilteredStreamer<>(this.connector, this, this).get(filterOptions, orderOptions, marker, pageSize);
+        return new PagedFilteredStreamer<>(this.connector, this, this).get(filterOptions, orderOptions, marker, pageSize);
     }
 
     @Override
@@ -81,40 +81,11 @@ public abstract class H2PojoDataAccessReader<Id, ObjectEntity, ObjectData, Versi
     @Override
     protected Optional<VersionObjectData> getVersionObjectDataById(final Id id) throws DataAccessReaderException {
 
-        String sqlVersion = "SELECT p1.*" +
-                            "  FROM " + this.connector.objectVersionTable() + " p1" +
-                            "    LEFT JOIN " + this.connector.objectVersionTable() + " p2" +
-                            "      ON (p1.object_id = p2.object_id) AND (p1.OBJECT_VERSION_ID < p2.OBJECT_VERSION_ID)\n" +
-                            "  WHERE p2.object_version_id IS NULL AND p1.object_id in (?);";
-
         return fetchSingleObject(
                 this.connector,
                 id,
-                sqlVersion,
+                Sql.latestVersionByObjectId(this.connector),
                 this.connector.nonFinalObjectVersionDataFields(),
                 this::createVersionObjectData);
     }
-//
-//    protected Stream<ObjectEntity> orderEntities(Stream<ObjectEntity> stream, OrderOptions options) {
-//
-//        if (options == null) {
-//            return stream;
-//        }
-//
-//        return ordererorder(stream, options);
-//    }
-
-//    protected Stream<ObjectEntity> pageEntities(Stream<ObjectEntity> stream, Id marker, int pageSize) {
-//
-//        // pageEntities();
-//        if (marker == null) {
-//            return stream.limit(pageSize);
-//        }
-//
-//        return skipUntil(stream, x -> marker.equals(getIdForEntity(x)))
-//                .skip(1)
-//                .limit(pageSize);
-//    }
-
-    protected abstract Id getIdForEntity(final ObjectEntity x);
 }

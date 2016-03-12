@@ -8,4 +8,6 @@ import lombok.Data;
 public class PersonFilterOptions {
 
     private final TextField socialSecurityNumber = new DefaultTextField();
+
+    private final TextField name = new DefaultTextField();
 }
