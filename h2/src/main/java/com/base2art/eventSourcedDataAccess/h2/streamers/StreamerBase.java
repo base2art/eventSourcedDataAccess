@@ -7,10 +7,7 @@ import com.base2art.eventSourcedDataAccess.h2.H2Connector;
 import com.base2art.eventSourcedDataAccess.h2.filters.H2ClauseCollection;
 import com.base2art.eventSourcedDataAccess.h2.parameters.RawH2Type;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.stream.Stream;
 
@@ -36,12 +33,12 @@ public class StreamerBase<Id, ObjectEntity, ObjectData, VersionObjectData> {
         return connector;
     }
 
-    public DataProducer<Id, ObjectData, VersionObjectData> producer() {
-        return producer;
-    }
-
     public EntityProducer<Id, ObjectEntity, ObjectData, VersionObjectData> getEntityProducer() {
         return entityProducer;
+    }
+
+    public DataProducer<Id, ObjectData, VersionObjectData> producer() {
+        return producer;
     }
 
     protected Stream<ObjectEntity> fetchAndMapVersionToEntity(final Map<Id, ObjectData> objectDatas) throws DataAccessReaderException {
@@ -49,7 +46,7 @@ public class StreamerBase<Id, ObjectEntity, ObjectData, VersionObjectData> {
                               .toArray(createGenericArray(this.connector.idType(), 0));
 
         StringJoiner joiner = new StringJoiner(", ", "(", ")");
-        for (int i = 0; i < ids.length; i++) {
+        for (final Id ignored : ids) {
             joiner.add("?");
         }
 
@@ -72,15 +69,12 @@ public class StreamerBase<Id, ObjectEntity, ObjectData, VersionObjectData> {
                 this.connector.nonFinalObjectVersionDataFields(),
                 this.producer()::createVersionObjectData);
 
-        List<ObjectEntity> items = new ArrayList<>();
-        for (Map.Entry<Id, ObjectData> pair : objectDatas.entrySet()) {
-            items.add(this.entityProducer.getObjectEntity(
-                    pair.getKey(),
-                    Optional.ofNullable(pair.getValue()),
-                    Optional.ofNullable(versionObjectDatas.getOrDefault(pair.getKey(), null))));
-        }
-
-        return items.stream();
+        return objectDatas.entrySet()
+                          .stream()
+                          .map(pair -> this.entityProducer.getObjectEntity(
+                                  pair.getKey(),
+                                  pair.getValue(),
+                                  versionObjectDatas.getOrDefault(pair.getKey(), null)));
     }
 
     protected Stream<ObjectEntity> getObjectEntityStream(

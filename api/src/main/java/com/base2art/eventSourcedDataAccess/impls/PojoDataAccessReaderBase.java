@@ -46,7 +46,7 @@ public abstract class PojoDataAccessReaderBase<Id, ObjectEntity, ObjectData, Ver
 
         Optional<VersionObjectData> versionObjectData = getVersionObjectDataById(id);
 
-        return getObjectEntity(id, objectData, versionObjectData);
+        return getObjectEntity(id, objectData.orElse(null), versionObjectData.orElse(null));
     }
 
     @Override
@@ -102,14 +102,14 @@ public abstract class PojoDataAccessReaderBase<Id, ObjectEntity, ObjectData, Ver
     @Override
     public ObjectEntity getObjectEntity(
             final Id id,
-            final Optional<ObjectData> objectData,
-            final Optional<VersionObjectData> versionObjectData) {
+            final ObjectData objectData,
+            final VersionObjectData versionObjectData) {
 
-        if (!versionObjectData.isPresent()) {
+        if (versionObjectData == null) {
             return null;
         }
 
-        return this.creationFunction.apply(id, objectData.get(), versionObjectData.get());
+        return this.creationFunction.apply(id, objectData, versionObjectData);
     }
 
     protected abstract Optional<ObjectData> getObjectDataById(Id id)
