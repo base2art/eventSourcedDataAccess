@@ -8,8 +8,8 @@ import java.util.Map;
 public class InMemoryPojoDataAccessWriter<Id, ObjectData, VersionObjectData>
         extends PojoDataAccessWriterBase<Id, ObjectData, VersionObjectData> {
 
-
     private final Map<Id, Archivable<ObjectData>> objectData;
+
     private final Multimap<Id, TimeStamped<VersionObjectData>> versionObjectData;
 
     public InMemoryPojoDataAccessWriter(

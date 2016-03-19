@@ -5,8 +5,8 @@ import com.base2art.eventSourcedDataAccess.DataAccessWriterException;
 import com.base2art.eventSourcedDataAccess.FilteredPagedDataAccessReader;
 import com.base2art.eventSourcedDataAccess.ItemDataAccessReader;
 import com.base2art.eventSourcedDataAccess.ObjectVersionFactory;
-import com.base2art.eventSourcedDataAccess.extensions.Filterer;
-import com.base2art.eventSourcedDataAccess.extensions.Orderer;
+import com.base2art.eventSourcedDataAccess.StreamFilterer;
+import com.base2art.eventSourcedDataAccess.StreamOrderer;
 import com.base2art.eventSourcedDataAccess.impls.PojoDataAccessReaderBase;
 
 import java.util.Arrays;
@@ -23,8 +23,8 @@ public abstract class GitDataAccessReader<Id, ObjectEntity, ObjectData, VersionO
     private final Class<VersionObjectData> objectVersionDataType;
     private final Class<ObjectData> objectDataType;
     private final GitReader<Id> reader;
-    private final Orderer<ObjectEntity, OrderOptions> orderer;
-    private final Filterer<ObjectEntity, FilterOptions> filterer;
+    private final StreamOrderer<ObjectEntity, OrderOptions> orderer;
+    private final StreamFilterer<ObjectEntity, FilterOptions> filterer;
 
     public GitDataAccessReader(
             final Class<ObjectEntity> catalogType,
@@ -32,8 +32,8 @@ public abstract class GitDataAccessReader<Id, ObjectEntity, ObjectData, VersionO
             final Class<VersionObjectData> objectVersionDataType,
             final ObjectVersionFactory<Id, ObjectData, VersionObjectData, ObjectEntity> factory,
             final GitReader<Id> reader,
-            final Filterer<ObjectEntity, FilterOptions> filterer,
-            final Orderer<ObjectEntity, OrderOptions> orderer) {
+            final StreamFilterer<ObjectEntity, FilterOptions> filterer,
+            final StreamOrderer<ObjectEntity, OrderOptions> orderer) {
 
         super(catalogType, factory);
         this.objectDataType = objectDataType;
@@ -131,7 +131,7 @@ public abstract class GitDataAccessReader<Id, ObjectEntity, ObjectData, VersionO
     protected Optional<ObjectData> getObjectDataById(final Id id) throws DataAccessReaderException {
         return this.reader.hasObject(id)
                ? Optional.of(this.reader.getObjectData(id, this.objectDataType))
-               : Optional.<ObjectData>empty();
+               : Optional.empty();
     }
 
     @Override
@@ -139,7 +139,7 @@ public abstract class GitDataAccessReader<Id, ObjectEntity, ObjectData, VersionO
             throws DataAccessReaderException {
         return this.reader.hasObject(id)
                ? Optional.ofNullable(this.reader.getLatestVersionObjectDataById(id, this.objectVersionDataType))
-               : Optional.<VersionObjectData>empty();
+               : Optional.empty();
     }
 
 

@@ -2,13 +2,12 @@ package com.base2art.eventSourcedDataAccess.memory;
 
 import lombok.Getter;
 
-import java.time.ZonedDateTime;
-
+import java.time.Instant;
 
 public class TimeStamped<T> {
 
     @Getter
-    private final ZonedDateTime time = ZonedDateTime.now();
+    private final Instant time = Instant.now();
 
     @Getter
     private final T data;

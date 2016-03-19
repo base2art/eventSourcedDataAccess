@@ -1,9 +1,9 @@
 package com.base2art.eventSourcedDataAccess.memory;
 
 import com.base2art.eventSourcedDataAccess.DataAccessReaderException;
+import com.base2art.eventSourcedDataAccess.StreamFilterer;
 import com.base2art.eventSourcedDataAccess.ObjectVersionFactory;
-import com.base2art.eventSourcedDataAccess.extensions.Filterer;
-import com.base2art.eventSourcedDataAccess.extensions.Orderer;
+import com.base2art.eventSourcedDataAccess.StreamOrderer;
 import com.base2art.eventSourcedDataAccess.impls.PojoDataAccessReaderBase;
 import com.google.common.collect.Multimap;
 
@@ -16,19 +16,18 @@ import static com.codepoetics.protonpack.StreamUtils.skipUntil;
 public abstract class InMemoryPojoDataAccessReader<Id, ObjectEntity, ObjectData, VersionObjectData, FilterOptions, OrderOptions>
         extends PojoDataAccessReaderBase<Id, ObjectEntity, ObjectData, VersionObjectData, FilterOptions, OrderOptions> {
 
-
     private final Map<Id, Archivable<ObjectData>> objectData;
     private final Multimap<Id, TimeStamped<VersionObjectData>> versionObjectData;
-    private final Orderer<ObjectEntity, OrderOptions> orderer;
-    private final Filterer<ObjectEntity, FilterOptions> filterer;
+    private final StreamOrderer<ObjectEntity, OrderOptions> orderer;
+    private final StreamFilterer<ObjectEntity, FilterOptions> filterer;
 
     public InMemoryPojoDataAccessReader(
             final Class<ObjectEntity> objectEntityClass,
             final ObjectVersionFactory<Id, ObjectData, VersionObjectData, ObjectEntity> creationFunction,
             final Map<Id, Archivable<ObjectData>> objectData,
             final Multimap<Id, TimeStamped<VersionObjectData>> versionObjectData,
-            final Filterer<ObjectEntity, FilterOptions> filterer,
-            final Orderer<ObjectEntity, OrderOptions> orderer) {
+            final StreamFilterer<ObjectEntity, FilterOptions> filterer,
+            final StreamOrderer<ObjectEntity, OrderOptions> orderer) {
 
         super(objectEntityClass, creationFunction);
 
@@ -68,7 +67,6 @@ public abstract class InMemoryPojoDataAccessReader<Id, ObjectEntity, ObjectData,
 
         return pageEntities(entities, marker, pageSize);
     }
-
 
     @Override
     protected Optional<ObjectData> getObjectDataById(final Id id) {
@@ -123,7 +121,6 @@ public abstract class InMemoryPojoDataAccessReader<Id, ObjectEntity, ObjectData,
     }
 
     protected abstract Id getIdForEntity(final ObjectEntity x);
-
 
     private Stream<ObjectEntity> createStream() throws DataAccessReaderException {
 

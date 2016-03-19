@@ -29,13 +29,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public abstract class PojoTestBase {
 
-
     private PojoAccessorFactory pojoAccessFactory;
 
     private final List<PersonData> expectedPerson = new ArrayList<>();
     private final List<UUID> expectedIDs = new ArrayList<>();
     private final List<PersonVersionData> expectedVersion = new ArrayList<>();
-
 
     @Before
     public void beforeEach() {
@@ -51,7 +49,7 @@ public abstract class PojoTestBase {
     }
 
     @Test
-    public void canReadSingleItem() throws DataAccessReaderException, DataAccessWriterException {
+    public void canReadSingleItem() throws DataAccessReaderException, DataAccessWriterException, InterruptedException {
 
         ResultableService<ItemDataAccessReader<UUID, Person>> getter = this.tryGet(this::itemReader);
 
@@ -61,12 +59,18 @@ public abstract class PojoTestBase {
 
         PersonData pd = new PersonData();
         pd.setSocialSecurityNumber("123-00-7897");
-        PersonVersionData pvd = new PersonVersionData();
-        pvd.setName("SjY");
+        PersonVersionData pvd1 = new PersonVersionData();
+        pvd1.setName("MjY");
 
         UUID id = UUID.randomUUID();
         writer.createObject(id, pd);
-        writer.insertVersion(id, pvd);
+        writer.insertVersion(id, pvd1);
+
+        // since we use millisecond based timeStamps we need a sleep in here.
+        Thread.sleep(2);
+        PersonVersionData pvd2 = new PersonVersionData();
+        pvd2.setName("SjY");
+        writer.insertVersion(id, pvd2);
 
         Person actual = getter.getService().getItem(id);
 
@@ -110,14 +114,34 @@ public abstract class PojoTestBase {
 
         setupData(expectedPerson, expectedVersion, expectedIDs, 250);
 
-        final Person[] filteredAndPaged = getter.getService().getFiltered(
-                new PersonFilterOptions(new EndsWithFilter("9")));
+        final PersonFilterOptions options = new PersonFilterOptions();
+        options.getSocialSecurityNumber().endsWith("9");
+        final Person[] filteredAndPaged = getter.getService().getFiltered(options);
         Arrays.sort(filteredAndPaged, (x, y) -> x.getName().compareTo(y.getName()));
         assertForNoMarker(filteredAndPaged, 25, "SjY1009", "SjY1249");
     }
 
     @Test
-    public void canReadManyItemsPaged() throws DataAccessReaderException, DataAccessWriterException {
+    public void canReadManyItemsPaged_ObjectSort() throws DataAccessReaderException, DataAccessWriterException {
+
+        ResultableService<PagedDataAccessReader<UUID, Person, PersonOrderOptions>> getter = this.tryGet(this::pagedSetReader);
+
+        org.junit.Assume.assumeTrue(!getter.hasError());
+
+        setupData(expectedPerson, expectedVersion, expectedIDs, 25);
+
+        final Person[] filteredAndPaged = getter.getService().getPaged(
+                PersonOrderOptions.SocialSecurityNumberAsc, null, 10);
+        assertForNoMarker(filteredAndPaged, 10, "SjY1000", "SjY1009");
+
+        final Person[] filteredAndPagedPage1 = getter.getService().getPaged(
+                PersonOrderOptions.SocialSecurityNumberAsc, lastId(filteredAndPaged), 10);
+
+        assertForNoMarker(filteredAndPagedPage1, 10, "SjY1010", "SjY1019");
+    }
+
+    @Test
+    public void canReadManyItemsPaged_ObjectVersionSort() throws DataAccessReaderException, DataAccessWriterException {
 
         ResultableService<PagedDataAccessReader<UUID, Person, PersonOrderOptions>> getter = this.tryGet(this::pagedSetReader);
 
@@ -136,26 +160,55 @@ public abstract class PojoTestBase {
     }
 
     @Test
-    public void canReadManyItemsFilteredAndPaged() throws DataAccessReaderException, DataAccessWriterException {
+    public void canReadManyItemsFilteredAndPaged_ObjectVersionSort() throws DataAccessReaderException, DataAccessWriterException {
+
+        final PersonOrderOptions nameAsc = PersonOrderOptions.NameAsc;
+        final PersonFilterOptions filterOptions = new PersonFilterOptions();
+        filterOptions.getSocialSecurityNumber().endsWith("9");
 
         ResultableService<FilteredPagedDataAccessReader<UUID, Person, PersonFilterOptions, PersonOrderOptions>> getter
                 = tryGet(this::filteredPagedSetReader);
 
         org.junit.Assume.assumeTrue(!getter.hasError());
 
-        setupData(expectedPerson, expectedVersion, expectedIDs, 25);
+        setupData(expectedPerson, expectedVersion, expectedIDs, 30);
 
-        final Person[] filteredAndPaged = getter.getService().getFilteredAndPaged(
-                new PersonFilterOptions(), PersonOrderOptions.NameAsc, null, 10);
-        assertForNoMarker(filteredAndPaged, 10, "SjY1000", "SjY1009");
+        final Person[] filteredAndPaged = getter.getService().getFilteredAndPaged(filterOptions, nameAsc, null, 2);
+        assertForNoMarker(filteredAndPaged, 2, "SjY1009", "SjY1019");
 
         final Person[] filteredAndPagedPage1 = getter.getService().getFilteredAndPaged(
-                new PersonFilterOptions(),
-                PersonOrderOptions.NameAsc,
+                filterOptions,
+                nameAsc,
                 filteredAndPaged[filteredAndPaged.length - 1].getId(),
-                10);
+                2);
 
-        assertForNoMarker(filteredAndPagedPage1, 10, "SjY1010", "SjY1019");
+        assertForNoMarker(filteredAndPagedPage1, 1, "SjY1029", "SjY1029");
+    }
+
+    @Test
+    public void canReadManyItemsFilteredAndPaged_ObjectSort() throws DataAccessReaderException, DataAccessWriterException {
+
+        final PersonOrderOptions nameAsc = PersonOrderOptions.NameAsc;
+        final PersonFilterOptions filterOptions = new PersonFilterOptions();
+        filterOptions.getName().endsWith("9");
+
+        ResultableService<FilteredPagedDataAccessReader<UUID, Person, PersonFilterOptions, PersonOrderOptions>> getter
+                = tryGet(this::filteredPagedSetReader);
+
+        org.junit.Assume.assumeTrue(!getter.hasError());
+
+        setupData(expectedPerson, expectedVersion, expectedIDs, 30);
+
+        final Person[] filteredAndPaged = getter.getService().getFilteredAndPaged(filterOptions, nameAsc, null, 2);
+        assertForNoMarker(filteredAndPaged, 2, "SjY1009", "SjY1019");
+
+        final Person[] filteredAndPagedPage1 = getter.getService().getFilteredAndPaged(
+                filterOptions,
+                nameAsc,
+                filteredAndPaged[filteredAndPaged.length - 1].getId(),
+                2);
+
+        assertForNoMarker(filteredAndPagedPage1, 1, "SjY1029", "SjY1029");
     }
 
     protected abstract PojoAccessorFactory get();
@@ -163,7 +216,6 @@ public abstract class PojoTestBase {
     protected void resetData() {
         this.pojoAccessFactory = this.get();
     }
-
 
     protected void cleanData() {
         if (this.pojoAccessFactory != null) {

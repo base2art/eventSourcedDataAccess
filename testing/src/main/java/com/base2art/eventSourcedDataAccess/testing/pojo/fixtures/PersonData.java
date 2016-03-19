@@ -6,5 +6,5 @@ import lombok.Data;
 @Data
 public class PersonData {
 
-    String socialSecurityNumber;
+    private String socialSecurityNumber;
 }

@@ -2,25 +2,27 @@ package com.base2art.eventSourcedDataAccess.impls;
 
 import com.base2art.eventSourcedDataAccess.DataAccessReader;
 import com.base2art.eventSourcedDataAccess.DataAccessReaderException;
+import com.base2art.eventSourcedDataAccess.EntityProducer;
 import com.base2art.eventSourcedDataAccess.FilteredDataAccessReader;
 import com.base2art.eventSourcedDataAccess.FilteredPagedDataAccessReader;
 import com.base2art.eventSourcedDataAccess.ItemDataAccessReader;
 import com.base2art.eventSourcedDataAccess.ObjectVersionFactory;
 import com.base2art.eventSourcedDataAccess.PagedDataAccessReader;
 
-import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static com.base2art.eventSourcedDataAccess.utils.Arrays.createGenericArray;
 
 public abstract class PojoDataAccessReaderBase<Id, ObjectEntity, ObjectData, VersionObjectData, FilterOptions, OrderOptions>
         implements DataAccessReader<ObjectEntity>,
                    FilteredDataAccessReader<ObjectEntity, FilterOptions>,
                    FilteredPagedDataAccessReader<Id, ObjectEntity, FilterOptions, OrderOptions>,
                    PagedDataAccessReader<Id, ObjectEntity, OrderOptions>,
-                   ItemDataAccessReader<Id, ObjectEntity> {
-
+                   ItemDataAccessReader<Id, ObjectEntity>,
+                   EntityProducer<Id, ObjectEntity, ObjectData, VersionObjectData> {
 
     private final Class<ObjectEntity> objectEntityClass;
     private final ObjectVersionFactory<Id, ObjectData, VersionObjectData, ObjectEntity> creationFunction;
@@ -36,7 +38,6 @@ public abstract class PojoDataAccessReaderBase<Id, ObjectEntity, ObjectData, Ver
     @Override
     public ObjectEntity getItem(final Id id) throws DataAccessReaderException {
 
-
         Optional<ObjectData> objectData = getObjectDataById(id);
 
         if (!objectData.isPresent()) {
@@ -45,11 +46,7 @@ public abstract class PojoDataAccessReaderBase<Id, ObjectEntity, ObjectData, Ver
 
         Optional<VersionObjectData> versionObjectData = getVersionObjectDataById(id);
 
-        if (!versionObjectData.isPresent()) {
-            return null;
-        }
-
-        return this.creationFunction.apply(id, objectData.get(), versionObjectData.get());
+        return getObjectEntity(id, objectData.orElse(null), versionObjectData.orElse(null));
     }
 
     @Override
@@ -75,7 +72,6 @@ public abstract class PojoDataAccessReaderBase<Id, ObjectEntity, ObjectData, Ver
             final int pageSize)
             throws DataAccessReaderException;
 
-
     @Override
     public ObjectEntity[] get() throws DataAccessReaderException {
 
@@ -87,7 +83,8 @@ public abstract class PojoDataAccessReaderBase<Id, ObjectEntity, ObjectData, Ver
         return compileToArray(streamFiltered(filterOptions));
     }
 
-    @Override public ObjectEntity[] getPaged(final OrderOptions orderOptions, final Id marker, final int pageSize) throws DataAccessReaderException {
+    @Override
+    public ObjectEntity[] getPaged(final OrderOptions orderOptions, final Id marker, final int pageSize) throws DataAccessReaderException {
         return compileToArray(streamPaged(orderOptions, marker, pageSize));
     }
 
@@ -100,6 +97,19 @@ public abstract class PojoDataAccessReaderBase<Id, ObjectEntity, ObjectData, Ver
             throws DataAccessReaderException {
 
         return compileToArray(streamFilteredAndPaged(filterOptions, orderOptions, marker, pageSize));
+    }
+
+    @Override
+    public ObjectEntity getObjectEntity(
+            final Id id,
+            final ObjectData objectData,
+            final VersionObjectData versionObjectData) {
+
+        if (versionObjectData == null) {
+            return null;
+        }
+
+        return this.creationFunction.apply(id, objectData, versionObjectData);
     }
 
     protected abstract Optional<ObjectData> getObjectDataById(Id id)
@@ -119,15 +129,5 @@ public abstract class PojoDataAccessReaderBase<Id, ObjectEntity, ObjectData, Ver
         }
 
         return arr;
-    }
-
-    public static <E> E[] createGenericArray(Class<E> elementType, int length) {
-
-        // Use Array native method to create array
-        // of a type only known at run time
-        @SuppressWarnings("unchecked")
-        final E[] a = (E[]) Array.newInstance(elementType, length);
-
-        return a;
     }
 }
