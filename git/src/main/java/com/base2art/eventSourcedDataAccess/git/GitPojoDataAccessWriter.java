@@ -4,12 +4,12 @@ import com.base2art.eventSourcedDataAccess.DataAccessWriterException;
 import com.base2art.eventSourcedDataAccess.impls.PojoDataAccessWriterBase;
 import lombok.Data;
 
-public class GitDataAccessWriter<Id, ObjectData, VersionObjectData>
+public class GitPojoDataAccessWriter<Id, ObjectData, VersionObjectData>
         extends PojoDataAccessWriterBase<Id, ObjectData, VersionObjectData> {
 
     private final GitWriter<Id> holder;
 
-    public GitDataAccessWriter(final GitWriter<Id> holder) {
+    public GitPojoDataAccessWriter(final GitWriter<Id> holder) {
         this.holder = holder;
     }
 

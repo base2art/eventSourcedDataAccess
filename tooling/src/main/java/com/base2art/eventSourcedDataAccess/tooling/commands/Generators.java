@@ -6,12 +6,7 @@ import com.base2art.eventSourcedDataAccess.tooling.commands.generation.Classifie
 import com.base2art.eventSourcedDataAccess.tooling.commands.generation.ClassifiedGeneratorItemConfiguration;
 import com.base2art.eventSourcedDataAccess.tooling.commands.generation.GeneratableItem;
 import com.base2art.eventSourcedDataAccess.tooling.commands.generation.GeneratorSearcher;
-import com.base2art.eventSourcedDataAccess.tooling.commands.generation.generators.EntityFilterOptionsGenerator;
-import com.base2art.eventSourcedDataAccess.tooling.commands.generation.generators.EntityGenerator;
-import com.base2art.eventSourcedDataAccess.tooling.commands.generation.generators.EntityOrderOptionsGenerator;
-import com.base2art.eventSourcedDataAccess.tooling.commands.generation.generators.EntityReaderGenerator;
-import com.base2art.eventSourcedDataAccess.tooling.commands.generation.generators.Generator;
-import com.base2art.eventSourcedDataAccess.tooling.commands.generation.generators.GeneratorContent;
+import com.base2art.eventSourcedDataAccess.tooling.commands.generation.generators.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -44,8 +39,17 @@ public class Generators implements Executor {
         Generator[] gens = new Generator[]{
                 new EntityGenerator(),
                 new EntityReaderGenerator(),
+                new EntityWriterGenerator(),
                 new EntityFilterOptionsGenerator(),
                 new EntityOrderOptionsGenerator(),
+                
+                new InMemoryEntityReaderGenerator(),
+                new H2EntityReaderGenerator(),
+                new GitEntityReaderGenerator(),
+                
+                new InMemoryEntityWriterGenerator(),
+                new H2EntityWriterGenerator(),
+                new GitEntityWriterGenerator(),
                 };
         for (GeneratableItem file : files) {
 
@@ -56,7 +60,12 @@ public class Generators implements Executor {
                       GeneratorContent output = generator.generate(classified);
                       if (output != null) {
 
-                          try (PrintWriter out = new PrintWriter(new File(file.getOutputDirectory(), output.getFileName()))) {
+                          final File outputDirectory = output.getOutputDirectory();
+                          if (!outputDirectory.exists()) {
+                              outputDirectory.mkdirs();
+                          }
+
+                          try (PrintWriter out = new PrintWriter(new File(outputDirectory, output.getFileName()))) {
                               out.print(output.getContent());
                           }
                           catch (FileNotFoundException e) {

@@ -1,8 +1,6 @@
 package com.base2art.eventSourcedDataAccess.h2.impls;
 
 import com.base2art.eventSourcedDataAccess.h2.H2Connector;
-import com.base2art.eventSourcedDataAccess.h2.H2Filterer;
-import com.base2art.eventSourcedDataAccess.h2.H2Orderer;
 import com.base2art.eventSourcedDataAccess.h2.H2PojoDataAccessReader;
 import com.base2art.eventSourcedDataAccess.testing.pojo.fixtures.Person;
 import com.base2art.eventSourcedDataAccess.testing.pojo.fixtures.PersonData;
@@ -19,9 +17,7 @@ public class H2PojoDataAccessReaderImpl
         super(
                 Person.class,
                 H2PojoDataAccessReaderImpl::map,
-                connector,
-                new H2Filterer<Person, PersonFilterOptions>() {},
-                new H2Orderer<Person, PersonOrderOptions>() {});
+                connector);
     }
 
     private static Person map(final UUID uuid, final PersonData personData, final PersonVersionData personVersionData) {

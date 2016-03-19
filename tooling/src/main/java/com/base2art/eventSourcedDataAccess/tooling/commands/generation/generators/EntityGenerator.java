@@ -5,6 +5,7 @@ import com.base2art.eventSourcedDataAccess.tooling.resx.Resources;
 import com.base2art.eventSourcedDataAccess.tooling.utils.ObjectAttribute;
 import com.base2art.eventSourcedDataAccess.tooling.utils.Reflection;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.TypeVariable;
@@ -82,13 +83,18 @@ public class EntityGenerator implements Generator {
 
         String content = Resources.entityTemplate(
                 String.join(".", item.getPackageName()),
-                item.getOutputClassName().toString(),
+                item.getOutputClassName(),
                 item.getObjectDataClass().getSimpleName(),
                 item.getObjectVersionDataClass().getSimpleName(),
                 getters,
                 assignments);
 
         return new GeneratorContent() {
+            @Override
+            public File getOutputDirectory() {
+                return item.getOutputDirectory();
+            }
+
             @Override
             public String getFileName() {
                 return item.getOutputClassName() + ".java";

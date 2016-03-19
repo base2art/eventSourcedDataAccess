@@ -6,8 +6,8 @@ import com.base2art.eventSourcedDataAccess.FilteredDataAccessReader;
 import com.base2art.eventSourcedDataAccess.FilteredPagedDataAccessReader;
 import com.base2art.eventSourcedDataAccess.ItemDataAccessReader;
 import com.base2art.eventSourcedDataAccess.PagedDataAccessReader;
-import com.base2art.eventSourcedDataAccess.git.impls.GitPojoDataAccessReaderImpl;
-import com.base2art.eventSourcedDataAccess.git.impls.GitPojoDataAccessWriterImpl;
+import com.base2art.eventSourcedDataAccess.git.impls.GitPojoPojoDataAccessReaderImpl;
+import com.base2art.eventSourcedDataAccess.git.impls.GitPojoPojoDataAccessWriterImpl;
 import com.base2art.eventSourcedDataAccess.git.utils.IOUtils;
 import com.base2art.eventSourcedDataAccess.testing.pojo.PojoAccessorFactory;
 import com.base2art.eventSourcedDataAccess.testing.pojo.fixtures.Person;
@@ -110,38 +110,38 @@ public class GitPojoAccessorFactory implements PojoAccessorFactory {
     @Override
     public DataAccessWriter<UUID, PersonData, PersonVersionData> writer() {
 
-        return new GitPojoDataAccessWriterImpl(config, catalogType);
+        return new GitPojoPojoDataAccessWriterImpl(config, catalogType);
     }
 
     @Override
     public ItemDataAccessReader<UUID, Person> itemReader() {
 
-        return new GitPojoDataAccessReaderImpl(config, catalogType);
+        return new GitPojoPojoDataAccessReaderImpl(config, catalogType);
     }
 
     @Override
     public DataAccessReader<Person> setReader() {
-        return new GitPojoDataAccessReaderImpl(config, catalogType);
+        return new GitPojoPojoDataAccessReaderImpl(config, catalogType);
     }
 
     @Override
     public FilteredDataAccessReader<Person, PersonFilterOptions> filteredSetReader() {
-        return new GitPojoDataAccessReaderImpl(config, catalogType);
+        return new GitPojoPojoDataAccessReaderImpl(config, catalogType);
     }
 
     @Override
     public FilteredPagedDataAccessReader<UUID, Person, PersonFilterOptions, PersonOrderOptions> filteredPagedSetReader() {
-        return new GitPojoDataAccessReaderImpl(config, catalogType);
+        return new GitPojoPojoDataAccessReaderImpl(config, catalogType);
     }
 
     @Override
     public PagedDataAccessReader<UUID, Person, PersonOrderOptions> pagedSetReader() {
-        return new GitPojoDataAccessReaderImpl(config, catalogType);
+        return new GitPojoPojoDataAccessReaderImpl(config, catalogType);
     }
 
     public void ensureUpdated() {
 
-        GitPojoDataAccessWriterImpl impl = new GitPojoDataAccessWriterImpl(config, catalogType);
+        GitPojoPojoDataAccessWriterImpl impl = new GitPojoPojoDataAccessWriterImpl(config, catalogType);
         impl.ensureUpdated();
     }
 }

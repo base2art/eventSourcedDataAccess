@@ -4,7 +4,7 @@ import com.base2art.eventSourcedDataAccess.conventional.FieldEnumOrderer;
 import com.base2art.eventSourcedDataAccess.conventional.FieldFilterer;
 import com.base2art.eventSourcedDataAccess.git.GitContainer;
 import com.base2art.eventSourcedDataAccess.git.GitDataAccessConfiguration;
-import com.base2art.eventSourcedDataAccess.git.GitDataAccessReader;
+import com.base2art.eventSourcedDataAccess.git.GitPojoDataAccessReader;
 import com.base2art.eventSourcedDataAccess.git.GitReader;
 import com.base2art.eventSourcedDataAccess.testing.pojo.fixtures.Person;
 import com.base2art.eventSourcedDataAccess.testing.pojo.fixtures.PersonData;
@@ -15,17 +15,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.UUID;
 
-public class GitPojoDataAccessReaderImpl
-        extends GitDataAccessReader<UUID, Person, PersonData, PersonVersionData, PersonFilterOptions, PersonOrderOptions> {
+public class GitPojoPojoDataAccessReaderImpl
+        extends GitPojoDataAccessReader<UUID, Person, PersonData, PersonVersionData, PersonFilterOptions, PersonOrderOptions> {
 
-    public GitPojoDataAccessReaderImpl(
+    public GitPojoPojoDataAccessReaderImpl(
             final GitDataAccessConfiguration config,
             final String catalogType) {
         super(
                 Person.class,
                 PersonData.class,
                 PersonVersionData.class,
-                GitPojoDataAccessReaderImpl::map,
+                GitPojoPojoDataAccessReaderImpl::map,
                 new GitReader<>(new GitContainer<>(config, catalogType, Object::toString), new ObjectMapper(), UUID.class),
                 new FieldFilterer<>(),
                 new FieldEnumOrderer<>(Person.class));
