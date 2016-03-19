@@ -42,7 +42,7 @@ public class EntityFilterOptionsGenerator implements Generator {
     }
 
     @Data
-    private class Tuple<T, T2> {
+    private static class Tuple<T, T2> {
 
         private final T item1;
         private final T2 item2;
