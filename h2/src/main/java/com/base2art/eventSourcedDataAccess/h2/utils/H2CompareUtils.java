@@ -1,7 +1,7 @@
 package com.base2art.eventSourcedDataAccess.h2.utils;
 
-import com.base2art.eventSourcedDataAccess.filtering.SimpleComparableField;
-import com.base2art.eventSourcedDataAccess.filtering.SimpleEquatableField;
+import com.base2art.eventSourcedDataAccess.filtering.SimpleComparableFilterField;
+import com.base2art.eventSourcedDataAccess.filtering.SimpleEquatableFilterField;
 import com.base2art.eventSourcedDataAccess.h2.filters.H2ClauseCollection;
 import com.base2art.eventSourcedDataAccess.h2.parameters.H2Type;
 import lombok.experimental.UtilityClass;
@@ -9,7 +9,7 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class H2CompareUtils {
 
-    public static <T, U extends SimpleComparableField<T>> void handleComparable(
+    public static <T, U extends SimpleComparableFilterField<T>> void handleComparable(
             final String columnName,
             final U filterField,
             final H2ClauseCollection collection,
@@ -24,7 +24,7 @@ public class H2CompareUtils {
         }
     }
 
-    public static <T, U extends SimpleEquatableField<T>> void handleEqual(
+    public static <T, U extends SimpleEquatableFilterField<T>> void handleEqual(
             final String columnName,
             final U filterField,
             final H2ClauseCollection collection,
@@ -48,7 +48,7 @@ public class H2CompareUtils {
 
     }
 
-    public static <T, U extends SimpleComparableField<T>> void handleEqualAndCompare(
+    public static <T, U extends SimpleComparableFilterField<T>> void handleEqualAndCompare(
             final String columnName,
             final U filterField,
             final H2ClauseCollection collection,

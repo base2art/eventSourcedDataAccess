@@ -78,3 +78,8 @@ results/
 
 privateKey.txt
 publicKey.txt
+
+
+pojoSamples/src/main/java/com/company/*Options.java
+pojoSamples/src/main/java/com/company/ProjectReader.java
+pojoSamples/src/main/java/com/company/Project.java

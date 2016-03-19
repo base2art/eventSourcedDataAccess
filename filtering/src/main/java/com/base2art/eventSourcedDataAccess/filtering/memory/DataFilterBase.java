@@ -1,8 +1,8 @@
 package com.base2art.eventSourcedDataAccess.filtering.memory;
 
-import com.base2art.eventSourcedDataAccess.filtering.SimpleEquatableField;
+import com.base2art.eventSourcedDataAccess.filtering.SimpleEquatableFilterField;
 
-public abstract class DataFilterBase<T, U extends SimpleEquatableField<T>>
+public abstract class DataFilterBase<T, U extends SimpleEquatableFilterField<T>>
         implements DataFilter<T, U> {
 
     @SuppressWarnings("unchecked")

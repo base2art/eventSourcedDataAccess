@@ -1,7 +1,7 @@
 package com.base2art.eventSourcedDataAccess.h2;
 
 import com.base2art.eventSourcedDataAccess.h2.filters.H2ClauseCollection;
-import com.base2art.eventSourcedDataAccess.h2.utils.ResourceReader;
+import com.base2art.eventSourcedDataAccess.utils.ResourceReader;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 
