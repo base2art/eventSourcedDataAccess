@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 
 import static com.codepoetics.protonpack.StreamUtils.skipUntil;
 
-public abstract class GitDataAccessReader<Id, ObjectEntity, ObjectData, VersionObjectData, FilterOptions, OrderOptions>
+public abstract class GitPojoDataAccessReader<Id, ObjectEntity, ObjectData, VersionObjectData, FilterOptions, OrderOptions>
         extends PojoDataAccessReaderBase<Id, ObjectEntity, ObjectData, VersionObjectData, FilterOptions, OrderOptions>
         implements FilteredPagedDataAccessReader<Id, ObjectEntity, FilterOptions, OrderOptions>,
                    ItemDataAccessReader<Id, ObjectEntity> {
@@ -26,7 +26,7 @@ public abstract class GitDataAccessReader<Id, ObjectEntity, ObjectData, VersionO
     private final StreamOrderer<ObjectEntity, OrderOptions> orderer;
     private final StreamFilterer<ObjectEntity, FilterOptions> filterer;
 
-    public GitDataAccessReader(
+    public GitPojoDataAccessReader(
             final Class<ObjectEntity> catalogType,
             final Class<ObjectData> objectDataType,
             final Class<VersionObjectData> objectVersionDataType,

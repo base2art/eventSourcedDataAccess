@@ -7,6 +7,7 @@ import com.base2art.eventSourcedDataAccess.tooling.utils.ObjectAttribute;
 import com.base2art.eventSourcedDataAccess.tooling.utils.Reflection;
 import lombok.Data;
 
+import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,6 +15,11 @@ public class EntityFilterOptionsGenerator implements Generator {
     @Override
     public GeneratorContent generate(final ClassifiedGeneratableItem item) {
         return new GeneratorContent() {
+            @Override
+            public File getOutputDirectory() {
+                return item.getOutputDirectory();
+            }
+
             @Override
             public String getFileName() {
                 return item.getOutputClassName() + "FilterOptions.java";

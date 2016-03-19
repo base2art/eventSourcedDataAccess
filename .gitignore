@@ -83,3 +83,5 @@ publicKey.txt
 pojoSamples/src/main/java/com/company/*Options.java
 pojoSamples/src/main/java/com/company/ProjectReader.java
 pojoSamples/src/main/java/com/company/Project.java
+pojoSamples/src/main/java/com/company/ProjectWriter.java
+pojoSamples/src/main/java/com/company/data/*

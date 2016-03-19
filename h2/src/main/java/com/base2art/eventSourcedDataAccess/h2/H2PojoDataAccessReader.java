@@ -17,21 +17,15 @@ public abstract class H2PojoDataAccessReader<Id, ObjectEntity, ObjectData, Versi
         extends PojoDataAccessReaderBase<Id, ObjectEntity, ObjectData, VersionObjectData, FilterOptions, OrderOptions>
         implements DataProducer<Id, ObjectData, VersionObjectData> {
 
-    private final H2Orderer<ObjectEntity, OrderOptions> orderer;
-    private final H2Filterer<ObjectEntity, FilterOptions> filterer;
     private final H2Connector<Id> connector;
 
     public H2PojoDataAccessReader(
             final Class<ObjectEntity> objectEntityClass,
             final ObjectVersionFactory<Id, ObjectData, VersionObjectData, ObjectEntity> creationFunction,
-            final H2Connector<Id> connector,
-            final H2Filterer<ObjectEntity, FilterOptions> filterer,
-            final H2Orderer<ObjectEntity, OrderOptions> orderer) {
+            final H2Connector<Id> connector) {
 
         super(objectEntityClass, creationFunction);
         this.connector = connector;
-        this.orderer = orderer;
-        this.filterer = filterer;
     }
 
     @Override

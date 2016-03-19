@@ -6,7 +6,7 @@ import com.base2art.eventSourcedDataAccess.tooling.resx.Resources;
 import java.io.File;
 import java.util.UUID;
 
-public class EntityReaderGenerator implements Generator {
+public class EntityWriterGenerator implements Generator {
     @Override
     public GeneratorContent generate(final ClassifiedGeneratableItem item) {
         return new GeneratorContent() {
@@ -14,15 +14,16 @@ public class EntityReaderGenerator implements Generator {
             public File getOutputDirectory() {
                 return item.getOutputDirectory();
             }
+
             @Override
             public String getFileName() {
-                return item.getOutputClassName() + "Reader.java";
+                return item.getOutputClassName() + "Writer.java";
             }
 
             @Override
             public String getContent() {
 
-                return Resources.entityReaderTemplate(
+                return Resources.entityWriterTemplate(
                         item.getPackageName(),
                         UUID.class.getTypeName(),
                         item.getOutputClassName(),
