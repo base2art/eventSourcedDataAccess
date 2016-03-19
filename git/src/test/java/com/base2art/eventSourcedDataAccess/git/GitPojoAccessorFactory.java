@@ -107,8 +107,8 @@ public class GitPojoAccessorFactory implements PojoAccessorFactory {
 
     @Override
     public void destroy() {
-//        IOUtils.deleteRecursive(this.next);
-//        IOUtils.deleteRecursive(this.base);
+        IOUtils.deleteRecursive(this.next);
+        IOUtils.deleteRecursive(this.base);
     }
 
     @Override
