@@ -46,10 +46,6 @@ public class PagedFilteredStreamer<Id, ObjectEntity, ObjectData, VersionObjectDa
 
         String sql = Sql.paged(getConnector(), marker, objectFields, sortField, sortInformation.isAscending(), objectJoiner, versionJoiner);
 
-        if (marker != null) {
-            System.out.println(sql);
-        }
-
         Map<Id, ObjectData> objectDatas = fetchObjectMap(
                 this.getConnector(),
                 sql,

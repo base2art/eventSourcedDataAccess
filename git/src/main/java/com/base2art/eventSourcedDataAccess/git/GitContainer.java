@@ -90,14 +90,12 @@ public class GitContainer<Id> {
         final File workingDir = getWorkingDir();
         if (!workingDir.exists()) {
 
-            System.out.println("cloning to " + workingDir);
             try (Git cloneResult = Git.cloneRepository()
                                       .setURI(config.getGitRepo())
                                       .setDirectory(workingDir)
                                       .setCloneAllBranches(true)
                                       .setCredentialsProvider(new UsernamePasswordCredentialsProvider(config.getUsername(), config.getPassword()))
                                       .call()) {
-                System.out.println("cloned to " + workingDir);
             }
             catch (GitAPIException e) {
                 throw new RuntimeException(e);

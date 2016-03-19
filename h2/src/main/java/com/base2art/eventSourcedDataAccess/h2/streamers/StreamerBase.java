@@ -74,8 +74,5 @@ public class StreamerBase<Id, ObjectEntity, ObjectData, VersionObjectData> {
                                   pair.getKey(),
                                   pair.getValue(),
                                   versionObjectDatas.getOrDefault(pair.getKey(), null)));
-//                                              .collect(Collectors.toList());
-//
-//        return items.stream();
     }
 }

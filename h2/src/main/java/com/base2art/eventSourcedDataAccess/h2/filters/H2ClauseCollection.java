@@ -46,7 +46,7 @@ public class H2ClauseCollection {
     }
 
     @Data
-    private class Setup {
+    private static class Setup {
         private final int parameterCount;
         private final String clause;
         private final PositionedSqlSetter setupMethod;

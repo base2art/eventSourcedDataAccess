@@ -55,7 +55,6 @@ public class ResourceReader {
 
     private static URL getResourceUrl(final String fileName, final ClassLoader loader) {
 
-//        val url = loader.getResource(fileName);
         val url = ResourceReader.class.getResource(fileName);
         if (url == null) {
             throw new IllegalStateException("Resource does not exist: " + fileName);

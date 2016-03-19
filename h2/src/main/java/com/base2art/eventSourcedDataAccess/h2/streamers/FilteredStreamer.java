@@ -34,8 +34,6 @@ public class FilteredStreamer<Id, ObjectEntity, ObjectData, VersionObjectData, F
 
         String sql = Sql.filtered(this.getConnector(), objectJoiner, versionJoiner);
 
-//        System.out.println(sql);
-
         Map<Id, ObjectData> objectDatas = fetchObjectMap(
                 this.getConnector(),
                 sql,

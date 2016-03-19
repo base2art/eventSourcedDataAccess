@@ -48,10 +48,6 @@ public class GitPojoAccessorFactory implements PojoAccessorFactory {
             this.next = new File(f_next, UUID.randomUUID().toString());
             base.mkdir();
 
-
-//            System.out.println("base: " + this.base);
-//            System.out.println("next: " + this.next);
-
             System.out.println("pre-init");
             Git.init()
                .setDirectory(base)
