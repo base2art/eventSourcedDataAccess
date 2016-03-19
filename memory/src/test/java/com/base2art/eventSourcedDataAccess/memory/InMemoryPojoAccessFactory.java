@@ -23,9 +23,9 @@ import java.util.UUID;
 
 public class InMemoryPojoAccessFactory implements PojoAccessorFactory {
 
-    private Map<UUID, Archivable<PersonData>> objectDatas = new HashMap<>();
+    private final Map<UUID, Archivable<PersonData>> objectDatas = new HashMap<>();
 
-    private Multimap<UUID, TimeStamped<PersonVersionData>> versionObjectDatas = ArrayListMultimap.create();
+    private final Multimap<UUID, TimeStamped<PersonVersionData>> versionObjectDatas = ArrayListMultimap.create();
 
     @Override
     public DataAccessWriter<UUID, PersonData, PersonVersionData> writer() {
@@ -61,7 +61,7 @@ public class InMemoryPojoAccessFactory implements PojoAccessorFactory {
 
     @Override
     public void destroy() {
-        objectDatas.clear();
-        versionObjectDatas.clear();
+        this.objectDatas.clear();
+        this.versionObjectDatas.clear();
     }
 }

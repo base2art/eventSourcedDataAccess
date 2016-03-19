@@ -1,8 +1,8 @@
 package com.base2art.eventSourcedDataAccess.h2.filters;
 
-import com.base2art.eventSourcedDataAccess.filtering.SimpleEquatableField;
+import com.base2art.eventSourcedDataAccess.filtering.SimpleEquatableFilterField;
 
-public abstract class H2FilterBase<T, U extends SimpleEquatableField<T>>
+public abstract class H2FilterBase<T, U extends SimpleEquatableFilterField<T>>
         implements H2Filter<T, U> {
 
     @SuppressWarnings("unchecked")

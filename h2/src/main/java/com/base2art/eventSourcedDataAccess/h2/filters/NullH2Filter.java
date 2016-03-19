@@ -1,8 +1,8 @@
 package com.base2art.eventSourcedDataAccess.h2.filters;
 
-import com.base2art.eventSourcedDataAccess.filtering.SimpleEquatableField;
+import com.base2art.eventSourcedDataAccess.filtering.SimpleEquatableFilterField;
 
-public class NullH2Filter<T, U extends SimpleEquatableField<T>>
+public class NullH2Filter<T, U extends SimpleEquatableFilterField<T>>
         extends H2FilterBase<T, U> {
 
     @Override

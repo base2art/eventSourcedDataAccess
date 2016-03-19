@@ -69,14 +69,13 @@ public class H2PojoDataAccessWriter<Id, ObjectData, VersionObjectData>
 
         insertRecord(
                 this.connector,
-                this.connector.objectTable(),
+                this.connector.objectStatusTable(),
                 id,
                 new ArchivableObject(),
-                this.connector.nonFinalObjectDataFields(),
+                Arrays.asList(ArchivableObject.class.getDeclaredFields()),
                 "object_id",
                 "?");
     }
-
 
     @Data
     private static class ArchivableObject {

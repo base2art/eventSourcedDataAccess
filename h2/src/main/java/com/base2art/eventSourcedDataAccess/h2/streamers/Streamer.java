@@ -4,6 +4,10 @@ import com.base2art.eventSourcedDataAccess.DataAccessReaderException;
 import com.base2art.eventSourcedDataAccess.EntityProducer;
 import com.base2art.eventSourcedDataAccess.h2.DataProducer;
 import com.base2art.eventSourcedDataAccess.h2.H2Connector;
+import com.base2art.eventSourcedDataAccess.h2.Sql;
+import com.base2art.eventSourcedDataAccess.h2.filters.H2ClauseCollection;
+import com.base2art.eventSourcedDataAccess.h2.utils.SqlBuilder;
+import lombok.val;
 
 import java.util.Map;
 import java.util.stream.Stream;
@@ -25,14 +29,11 @@ public class Streamer<Id, ObjectEntity, ObjectData, VersionObjectData>
     public Stream<ObjectEntity> get() throws DataAccessReaderException {
 
 
-        String sql = "SELECT * FROM " + this.getConnector().objectTable();
+        val objectJoiner = new H2ClauseCollection();
+        val versionJoiner = new H2ClauseCollection();
 
-        Map<Id, ObjectData> objectDatas = fetchObjectMap(
-                this.getConnector(),
-                sql,
-                null,
-                this.getConnector().nonFinalObjectDataFields(),
-                this.producer()::createObjectData);
-        return fetchAndMapVersionToEntity(objectDatas);
+        String sql = Sql.filtered(this.getConnector(), objectJoiner, versionJoiner);
+
+        return getObjectEntityStream(null, Integer.MAX_VALUE, objectJoiner, versionJoiner, sql);
     }
 }

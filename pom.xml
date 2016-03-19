@@ -14,6 +14,8 @@
         <module>testing</module>
         <module>h2</module>
         <module>filtering</module>
+        <module>tooling</module>
+        <module>pojoSamples</module>
     </modules>
     <name>eventSourcedDataAccess-project</name>
 

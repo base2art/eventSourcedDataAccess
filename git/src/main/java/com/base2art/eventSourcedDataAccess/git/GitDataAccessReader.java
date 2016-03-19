@@ -74,7 +74,6 @@ public abstract class GitDataAccessReader<Id, ObjectEntity, ObjectData, VersionO
         return pageEntities(entities, marker, pageSize);
     }
 
-
     protected Stream<ObjectEntity> filterEntities(Stream<ObjectEntity> stream, FilterOptions options) {
 
         if (options == null) {
@@ -104,10 +103,8 @@ public abstract class GitDataAccessReader<Id, ObjectEntity, ObjectData, VersionO
                                                                        .limit(pageSize);
     }
 
-
     public Stream<ObjectEntity> createStream()
             throws DataAccessReaderException {
-
 
         try {
             return Arrays.stream(this.reader.getCatalog()
@@ -126,11 +123,10 @@ public abstract class GitDataAccessReader<Id, ObjectEntity, ObjectData, VersionO
         }
     }
 
-
     @Override
     protected Optional<ObjectData> getObjectDataById(final Id id) throws DataAccessReaderException {
         return this.reader.hasObject(id)
-               ? Optional.of(this.reader.getObjectData(id, this.objectDataType))
+               ? Optional.ofNullable(this.reader.getObjectData(id, this.objectDataType))
                : Optional.empty();
     }
 
@@ -141,7 +137,6 @@ public abstract class GitDataAccessReader<Id, ObjectEntity, ObjectData, VersionO
                ? Optional.ofNullable(this.reader.getLatestVersionObjectDataById(id, this.objectVersionDataType))
                : Optional.empty();
     }
-
 
     protected abstract Id getIdForEntity(final ObjectEntity x);
 }

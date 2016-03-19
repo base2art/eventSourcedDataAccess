@@ -4,6 +4,7 @@ import com.base2art.eventSourcedDataAccess.DataAccessReaderException;
 import com.base2art.eventSourcedDataAccess.EntityProducer;
 import com.base2art.eventSourcedDataAccess.h2.DataProducer;
 import com.base2art.eventSourcedDataAccess.h2.H2Connector;
+import com.base2art.eventSourcedDataAccess.h2.filters.H2ClauseCollection;
 import com.base2art.eventSourcedDataAccess.h2.parameters.RawH2Type;
 
 import java.util.Map;
@@ -74,5 +75,36 @@ public class StreamerBase<Id, ObjectEntity, ObjectData, VersionObjectData> {
                                   pair.getKey(),
                                   pair.getValue(),
                                   versionObjectDatas.getOrDefault(pair.getKey(), null)));
+    }
+
+    protected Stream<ObjectEntity> getObjectEntityStream(
+            final Id marker,
+            final int pageSize,
+            final H2ClauseCollection objectJoiner,
+            final H2ClauseCollection versionJoiner,
+            final String sql) throws DataAccessReaderException {
+
+        Map<Id, ObjectData> objectDatas = fetchObjectMap(
+                this.getConnector(),
+                sql,
+                (statement) -> {
+                    if (marker == null) {
+                        int counter = versionJoiner.setParameters(statement, 1);
+                        counter = objectJoiner.setParameters(statement, counter);
+                        statement.setInt(counter, pageSize);
+                    }
+                    else {
+
+                        int counter = versionJoiner.setParameters(statement, 1);
+                        counter = objectJoiner.setParameters(statement, counter);
+                        counter = versionJoiner.setParameters(statement, counter);
+                        counter = objectJoiner.setParameters(statement, counter);
+                        connector.idH2Type().setParameter(statement, counter, marker);
+                        statement.setInt(counter + 1, pageSize);
+                    }
+                },
+                connector.nonFinalObjectDataFields(),
+                this.producer()::createObjectData);
+        return fetchAndMapVersionToEntity(objectDatas);
     }
 }

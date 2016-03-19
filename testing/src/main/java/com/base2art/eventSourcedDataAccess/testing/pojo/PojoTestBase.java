@@ -211,6 +211,38 @@ public abstract class PojoTestBase {
         assertForNoMarker(filteredAndPagedPage1, 1, "SjY1029", "SjY1029");
     }
 
+    @Test
+    public void canArchive() throws DataAccessReaderException, DataAccessWriterException {
+
+        setupData(expectedPerson, expectedVersion, expectedIDs, 50);
+
+        final List<UUID> expectedIDs1 = this.expectedIDs;
+        for (int i = 0; i < 20; i++) {
+            final UUID id = expectedIDs1.get(i);
+            this.writer().archiveObject(id);
+        }
+
+        final PersonOrderOptions nameAsc = PersonOrderOptions.NameAsc;
+        final PersonFilterOptions filterOptions = new PersonFilterOptions();
+        filterOptions.getSocialSecurityNumber().endsWith("9");
+
+        ResultableService<FilteredPagedDataAccessReader<UUID, Person, PersonFilterOptions, PersonOrderOptions>> getter
+                = tryGet(this::filteredPagedSetReader);
+
+        org.junit.Assume.assumeTrue(!getter.hasError());
+
+        final Person[] filteredAndPaged = getter.getService().getFilteredAndPaged(filterOptions, nameAsc, null, 2);
+        assertForNoMarker(filteredAndPaged, 2, "SjY1029", "SjY1039");
+
+        final Person[] filteredAndPagedPage1 = getter.getService().getFilteredAndPaged(
+                filterOptions,
+                nameAsc,
+                filteredAndPaged[filteredAndPaged.length - 1].getId(),
+                2);
+
+        assertForNoMarker(filteredAndPagedPage1, 1, "SjY1049", "SjY1049");
+    }
+
     protected abstract PojoAccessorFactory get();
 
     protected void resetData() {

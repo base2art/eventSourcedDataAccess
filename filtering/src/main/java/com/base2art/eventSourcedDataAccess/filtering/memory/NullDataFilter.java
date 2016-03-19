@@ -1,8 +1,8 @@
 package com.base2art.eventSourcedDataAccess.filtering.memory;
 
-import com.base2art.eventSourcedDataAccess.filtering.SimpleEquatableField;
+import com.base2art.eventSourcedDataAccess.filtering.SimpleEquatableFilterField;
 
-public class NullDataFilter<T, U extends SimpleEquatableField<T>>
+public class NullDataFilter<T, U extends SimpleEquatableFilterField<T>>
         extends DataFilterBase<T, U> {
 
 

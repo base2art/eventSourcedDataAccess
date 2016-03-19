@@ -1,13 +1,13 @@
 package com.base2art.eventSourcedDataAccess.testing.pojo.fixtures;
 
-import com.base2art.eventSourcedDataAccess.filtering.TextField;
-import com.base2art.eventSourcedDataAccess.filtering.fields.DefaultTextField;
+import com.base2art.eventSourcedDataAccess.filtering.TextFilterField;
+import com.base2art.eventSourcedDataAccess.filtering.fields.DefaultTextFilterField;
 import lombok.Data;
 
 @Data
 public class PersonFilterOptions {
 
-    private final TextField socialSecurityNumber = new DefaultTextField();
+    private final TextFilterField socialSecurityNumber = new DefaultTextFilterField();
 
-    private final TextField name = new DefaultTextField();
+    private final TextFilterField name = new DefaultTextFilterField();
 }

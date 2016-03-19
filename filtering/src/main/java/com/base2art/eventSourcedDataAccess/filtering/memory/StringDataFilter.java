@@ -1,12 +1,12 @@
 package com.base2art.eventSourcedDataAccess.filtering.memory;
 
-import com.base2art.eventSourcedDataAccess.filtering.TextField;
+import com.base2art.eventSourcedDataAccess.filtering.TextFilterField;
 import com.base2art.eventSourcedDataAccess.filtering.utils.CompareUtils;
 
-public class StringDataFilter extends DataFilterBase<String, TextField> {
+public class StringDataFilter extends DataFilterBase<String, TextFilterField> {
 
     @Override
-    public boolean handle(final String type, final TextField filterField) {
+    public boolean handle(final String type, final TextFilterField filterField) {
 
         if (!CompareUtils.handleEqual(type, filterField)) {
             return false;

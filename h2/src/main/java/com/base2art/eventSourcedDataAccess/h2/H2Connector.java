@@ -99,38 +99,10 @@ public class H2Connector<Id> {
         try (Connection connection = this.connectionPool.getConnection()) {
 
             try (Statement objectStatement = connection.createStatement()) {
-                StringBuilder objectSql = new StringBuilder();
-
-                objectSql.append("CREATE TABLE IF NOT EXISTS ").append(this.objectTable()).append(" (").append("\n");
-                objectSql.append("  object_id " + this.idH2Type().getTypeName() + " NOT NULL").append("\n");
-                objectSql.append(")").append("\n");
-                objectStatement.executeUpdate(objectSql.toString());
-            }
-
-            try (Statement objectStatement = connection.createStatement()) {
-                StringBuilder objectSql = new StringBuilder();
-
-                objectSql.append("CREATE TABLE IF NOT EXISTS ").append(this.objectStatusTable()).append(" (").append("\n");
-                objectSql.append("  object_status_version_id IDENTITY NOT NULL,").append("\n");
-                objectSql.append("  object_id " + this.idH2Type().getTypeName() + " NOT NULL,").append("\n");
-                objectSql.append("  isArchived BOOLEAN NOT NULL").append("\n");
-                objectSql.append(")").append("\n");
-                objectStatement.executeUpdate(objectSql.toString());
+                objectStatement.executeUpdate(Sql.ddl(this, 0));
             }
 
             updateTableColumns(connection, this.objectTable(), nonFinalObjectDataFields());
-
-            try (Statement objectVersionStatement = connection.createStatement()) {
-                StringBuilder sql = new StringBuilder();
-
-                sql.append("CREATE TABLE IF NOT EXISTS ").append(this.objectVersionTable()).append(" (").append("\n");
-                sql.append("  object_version_id IDENTITY NOT NULL,").append("\n");
-                sql.append("  object_id " + this.idH2Type().getTypeName() + " NOT NULL").append("\n");
-                sql.append(")").append("\n");
-
-                objectVersionStatement.executeUpdate(sql.toString());
-            }
-
             updateTableColumns(connection, this.objectVersionTable(), nonFinalObjectVersionDataFields());
 
             connection.commit();
@@ -160,23 +132,3 @@ public class H2Connector<Id> {
         }
     }
 }
-
-            /*
-
-DROP TABLE IF EXISTS test1;
-
-CREATE TABLE IF NOT EXISTS test1 (
-    col16 VARCHAR(16) NOT NULL
-);
-
-ALTER TABLE test1
-ADD col2 INT;
-
-INSERT INTO test1 (col16, col2) VALUES ('sdf', 1);
-INSERT INTO test1 (col16, col2) VALUES ('wer', 2);
-INSERT INTO test1 (col16, col2) VALUES ('rty', 3);
-INSERT INTO test1 (col16, col2) VALUES ('456', 4);
-
-SELECT col2 FROM test1;
-
-            */

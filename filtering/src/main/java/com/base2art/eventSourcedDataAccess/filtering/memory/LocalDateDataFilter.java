@@ -1,14 +1,14 @@
 package com.base2art.eventSourcedDataAccess.filtering.memory;
 
-import com.base2art.eventSourcedDataAccess.filtering.DateField;
+import com.base2art.eventSourcedDataAccess.filtering.DateFilterField;
 import com.base2art.eventSourcedDataAccess.filtering.utils.CompareUtils;
 
 import java.time.LocalDate;
 
-public class LocalDateDataFilter extends DataFilterBase<LocalDate, DateField> {
+public class LocalDateDataFilter extends DataFilterBase<LocalDate, DateFilterField> {
 
     @Override
-    public boolean handle(final LocalDate type, final DateField filterField) {
+    public boolean handle(final LocalDate type, final DateFilterField filterField) {
 
         if (!CompareUtils.handleEqual(type, filterField)) {
             return false;

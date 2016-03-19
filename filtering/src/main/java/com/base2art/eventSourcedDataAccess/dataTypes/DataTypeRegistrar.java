@@ -50,6 +50,13 @@ public class DataTypeRegistrar {
         return map.toArray(new DataType[map.size()]);
     }
 
+    public static boolean hasType(Class<?> type) {
+        return map.stream()
+                  .filter(x -> x.getNonPrimitiveClass() == type || x.getPrimitiveClass() == type)
+                  .findFirst()
+                  .isPresent();
+    }
+
     private static <T> DataType<T> register(final DataType<T> dataTypeBase) {
         map.add(dataTypeBase);
         return dataTypeBase;

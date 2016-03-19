@@ -12,7 +12,13 @@ SELECT pj.*
                             LEFT JOIN {objectVersionTableName} p2
                               ON (p1.object_id = p2.object_id) AND (p1.OBJECT_VERSION_ID < p2.OBJECT_VERSION_ID)
 
-                            WHERE p2.object_version_id IS NULL {objectVersionClause} {objectClause}
+                            LEFT JOIN {objectStatusTableName} ost
+                              ON (p1.object_id = ost.object_id)
+
+                            WHERE p2.object_version_id IS NULL
+                              AND ( (ost.isArchived IS NULL) OR (ost.isArchived = 0))
+                              {objectVersionClause}
+                              {objectClause}
                             ORDER BY {sortColumnTable[ot|p1]}.{sortColumn} {sortDirection}
                       ) poo
                ) porn
