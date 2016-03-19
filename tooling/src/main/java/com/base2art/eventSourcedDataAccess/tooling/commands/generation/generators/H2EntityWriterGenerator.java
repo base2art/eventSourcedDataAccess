@@ -6,7 +6,7 @@ import com.base2art.eventSourcedDataAccess.tooling.resx.Resources;
 import java.io.File;
 import java.util.UUID;
 
-public class GitEnitityReaderGenerator implements Generator {
+public class H2EntityWriterGenerator implements Generator {
     @Override
     public GeneratorContent generate(final ClassifiedGeneratableItem item) {
         return new GeneratorContent() {
@@ -17,13 +17,13 @@ public class GitEnitityReaderGenerator implements Generator {
 
             @Override
             public String getFileName() {
-                return "Git" + item.getOutputClassName() + "Reader.java";
+                return "H2" + item.getOutputClassName() + "Writer.java";
             }
 
             @Override
             public String getContent() {
 
-                return Resources.entityGitReaderTemplate(
+                return Resources.entityH2WriterTemplate(
                         item.getPackageName(),
                         UUID.class.getTypeName(),
                         item.getOutputClassName(),

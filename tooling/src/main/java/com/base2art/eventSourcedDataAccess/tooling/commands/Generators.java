@@ -42,9 +42,14 @@ public class Generators implements Executor {
                 new EntityWriterGenerator(),
                 new EntityFilterOptionsGenerator(),
                 new EntityOrderOptionsGenerator(),
-                new InMemoryEnitityReaderGenerator(),
-                new H2EnitityReaderGenerator(),
-                new GitEnitityReaderGenerator(),
+                
+                new InMemoryEntityReaderGenerator(),
+                new H2EntityReaderGenerator(),
+                new GitEntityReaderGenerator(),
+                
+                new InMemoryEntityWriterGenerator(),
+                new H2EntityWriterGenerator(),
+                new GitEntityWriterGenerator(),
                 };
         for (GeneratableItem file : files) {
 
