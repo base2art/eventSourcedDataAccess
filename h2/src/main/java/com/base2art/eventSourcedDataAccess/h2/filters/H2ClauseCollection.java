@@ -44,15 +44,6 @@ public class H2ClauseCollection {
 
         return baseCounter;
     }
-//
-//    public int setParameters(int counter) {
-//
-//        for (Setup s : this.items) {
-//            s.setupMethod
-//        }
-//
-//        return counter;
-//    }
 
     @Data
     private class Setup {

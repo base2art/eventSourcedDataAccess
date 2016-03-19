@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -69,6 +70,8 @@ public class GitReader<Id> {
             if (items.length == 0) {
                 return null;
             }
+
+            Arrays.sort(items, File::compareTo);
 
             File versionFile = items[items.length - 1];
 

@@ -131,7 +131,7 @@ public abstract class GitDataAccessReader<Id, ObjectEntity, ObjectData, VersionO
     protected Optional<ObjectData> getObjectDataById(final Id id) throws DataAccessReaderException {
         return this.reader.hasObject(id)
                ? Optional.of(this.reader.getObjectData(id, this.objectDataType))
-               : Optional.<ObjectData>empty();
+               : Optional.empty();
     }
 
     @Override
@@ -139,7 +139,7 @@ public abstract class GitDataAccessReader<Id, ObjectEntity, ObjectData, VersionO
             throws DataAccessReaderException {
         return this.reader.hasObject(id)
                ? Optional.ofNullable(this.reader.getLatestVersionObjectDataById(id, this.objectVersionDataType))
-               : Optional.<VersionObjectData>empty();
+               : Optional.empty();
     }
 
 
