@@ -30,7 +30,9 @@ public class H2PojoAccessFactory implements PojoAccessorFactory {
             this.file = File.createTempFile("test", ".h2");
             System.out.println(this.file.getAbsolutePath());
             this.connector = new H2Connector<>(
-                    file.getAbsolutePath(),
+                    "jdbc:h2:" + file.getAbsolutePath(),
+                    "sa",
+                    "sa",
                     PersonData.class.getSimpleName(),
                     UUID.class,
                     PersonData.class,

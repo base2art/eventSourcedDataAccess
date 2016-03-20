@@ -162,6 +162,22 @@ public class Resources {
                              .replace("java.lang.", "");
     }
 
+    public static String entityH2ConnectorTemplate(
+            final String packageName,
+            final String entityIdTypeName,
+            final String entityName,
+            final String objectDataTypeName,
+            final String objectVersionDataTypeName) {
+
+        return ResourceReader.readStringUnchecked("/H2EntityConnectorTemplate.java", Resources.class.getClassLoader())
+                             .replace("{packageName}", String.join(".", packageName))
+                             .replace("{entityTypeName}", entityName)
+                             .replace("{entityIdTypeName}", entityIdTypeName)
+                             .replace("{objectDataTypeName}", objectDataTypeName)
+                             .replace("{objectVersionDataTypeName}", objectVersionDataTypeName)
+                             .replace("java.lang.", "");
+    }
+
     public static String entityGitWriterTemplate(
             final String packageName,
             final String entityIdTypeName,

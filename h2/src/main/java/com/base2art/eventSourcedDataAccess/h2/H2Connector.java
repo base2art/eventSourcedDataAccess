@@ -18,6 +18,8 @@ public class H2Connector<Id> {
     private JdbcConnectionPool connectionPool;
 
     private final String location;
+    private String user;
+    private String password;
     private final String catalogName;
     private final Class<Id> idType;
     private final Class<?> objectDataClass;
@@ -26,11 +28,15 @@ public class H2Connector<Id> {
 
     public H2Connector(
             final String location,
+            final String user,
+            final String password,
             final String catalogName,
             final Class<Id> idType,
             final Class<?> objectDataClass,
             final Class<?> objectVersionDataClass) {
         this.location = location;
+        this.user = user;
+        this.password = password;
         this.catalogName = catalogName;
         this.idType = idType;
         this.objectDataClass = objectDataClass;
@@ -91,9 +97,9 @@ public class H2Connector<Id> {
         org.h2.Driver.load();
         if (this.connectionPool == null) {
             this.connectionPool = JdbcConnectionPool.create(
-                    "jdbc:h2:" + this.location,
-                    "sa",
-                    "sa");
+                    this.location,
+                    this.user,
+                    this.password);
         }
 
         try (Connection connection = this.connectionPool.getConnection()) {

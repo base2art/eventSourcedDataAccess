@@ -42,7 +42,7 @@ public class EntityFilterOptionsGenerator implements Generator {
                 return Resources.entityFilterOptionsTemplate(
                         item.getPackageName(),
                         item.getOutputClassName(),
-                        String.join("," + System.lineSeparator(), fields));
+                        String.join(System.lineSeparator(), fields));
             }
         };
     }
