@@ -15,6 +15,7 @@ import com.base2art.eventSourcedDataAccess.testing.pojo.fixtures.PersonData;
 import com.base2art.eventSourcedDataAccess.testing.pojo.fixtures.PersonFilterOptions;
 import com.base2art.eventSourcedDataAccess.testing.pojo.fixtures.PersonOrderOptions;
 import com.base2art.eventSourcedDataAccess.testing.pojo.fixtures.PersonVersionData;
+import lombok.Getter;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
@@ -27,8 +28,9 @@ import java.util.UUID;
 
 public class GitPojoAccessorFactory implements PojoAccessorFactory {
 
-
     private final GitDataAccessConfiguration config;
+    @Getter
+    private final GitMessageQueue messageQueue;
     private final String catalogType;
     private final File base;
     private final File next;
@@ -56,7 +58,6 @@ public class GitPojoAccessorFactory implements PojoAccessorFactory {
             System.out.println("post-init");
 
             Files.write(new File(base, "abc").toPath(), Collections.singletonList(""));
-
 
             System.out.println("pre-add");
             Git.open(base)
@@ -88,9 +89,14 @@ public class GitPojoAccessorFactory implements PojoAccessorFactory {
                 "sjY",
                 "SjY@gmail.com",
                 "Message",
+                true,
                 true);
-        this.catalogType = new Random().nextInt() + "";
 
+        GitTrigger trigger = (x) -> {
+            this.getMessageQueue().run();
+        };
+        messageQueue = new GitMessageQueue(new GitWorker(config), trigger);
+        this.catalogType = new Random().nextInt() + "";
 
         try {
             Thread.sleep(1000L);
@@ -98,7 +104,6 @@ public class GitPojoAccessorFactory implements PojoAccessorFactory {
         catch (InterruptedException e) {
             e.printStackTrace();
         }
-
     }
 
     @Override
@@ -110,38 +115,38 @@ public class GitPojoAccessorFactory implements PojoAccessorFactory {
     @Override
     public DataAccessWriter<UUID, PersonData, PersonVersionData> writer() {
 
-        return new GitPojoPojoDataAccessWriterImpl(config, catalogType);
+        return new GitPojoPojoDataAccessWriterImpl(config, messageQueue, catalogType);
     }
 
     @Override
     public ItemDataAccessReader<UUID, Person> itemReader() {
 
-        return new GitPojoPojoDataAccessReaderImpl(config, catalogType);
+        return new GitPojoPojoDataAccessReaderImpl(config, messageQueue, catalogType);
     }
 
     @Override
     public DataAccessReader<Person> setReader() {
-        return new GitPojoPojoDataAccessReaderImpl(config, catalogType);
+        return new GitPojoPojoDataAccessReaderImpl(config, messageQueue, catalogType);
     }
 
     @Override
     public FilteredDataAccessReader<Person, PersonFilterOptions> filteredSetReader() {
-        return new GitPojoPojoDataAccessReaderImpl(config, catalogType);
+        return new GitPojoPojoDataAccessReaderImpl(config, messageQueue, catalogType);
     }
 
     @Override
     public FilteredPagedDataAccessReader<UUID, Person, PersonFilterOptions, PersonOrderOptions> filteredPagedSetReader() {
-        return new GitPojoPojoDataAccessReaderImpl(config, catalogType);
+        return new GitPojoPojoDataAccessReaderImpl(config, messageQueue, catalogType);
     }
 
     @Override
     public PagedDataAccessReader<UUID, Person, PersonOrderOptions> pagedSetReader() {
-        return new GitPojoPojoDataAccessReaderImpl(config, catalogType);
+        return new GitPojoPojoDataAccessReaderImpl(config, messageQueue, catalogType);
     }
 
     public void ensureUpdated() {
 
-        GitPojoPojoDataAccessWriterImpl impl = new GitPojoPojoDataAccessWriterImpl(config, catalogType);
+        GitPojoPojoDataAccessWriterImpl impl = new GitPojoPojoDataAccessWriterImpl(config, messageQueue, catalogType);
         impl.ensureUpdated();
     }
 }

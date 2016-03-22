@@ -107,7 +107,7 @@ public abstract class GitPojoDataAccessReader<Id, ObjectEntity, ObjectData, Vers
             throws DataAccessReaderException {
 
         try {
-            return Arrays.stream(this.reader.getCatalog()
+            return Arrays.stream(this.reader.getCatalog(true)
                                             .listFiles((x, y) -> !y.startsWith(".")))
                          .map(x -> {
                              try {

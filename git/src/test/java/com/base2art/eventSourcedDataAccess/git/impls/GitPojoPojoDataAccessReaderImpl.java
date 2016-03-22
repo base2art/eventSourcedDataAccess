@@ -4,6 +4,7 @@ import com.base2art.eventSourcedDataAccess.conventional.FieldEnumOrderer;
 import com.base2art.eventSourcedDataAccess.conventional.FieldFilterer;
 import com.base2art.eventSourcedDataAccess.git.GitContainer;
 import com.base2art.eventSourcedDataAccess.git.GitDataAccessConfiguration;
+import com.base2art.eventSourcedDataAccess.git.GitMessageQueue;
 import com.base2art.eventSourcedDataAccess.git.GitPojoDataAccessReader;
 import com.base2art.eventSourcedDataAccess.git.GitReader;
 import com.base2art.eventSourcedDataAccess.testing.pojo.fixtures.Person;
@@ -20,13 +21,14 @@ public class GitPojoPojoDataAccessReaderImpl
 
     public GitPojoPojoDataAccessReaderImpl(
             final GitDataAccessConfiguration config,
+            final GitMessageQueue messageQueue,
             final String catalogType) {
         super(
                 Person.class,
                 PersonData.class,
                 PersonVersionData.class,
                 GitPojoPojoDataAccessReaderImpl::map,
-                new GitReader<>(new GitContainer<>(config, catalogType, Object::toString), new ObjectMapper(), UUID.class),
+                new GitReader<>(new GitContainer<>(config, messageQueue, catalogType, Object::toString), new ObjectMapper(), UUID.class),
                 new FieldFilterer<>(),
                 new FieldEnumOrderer<>(Person.class));
     }

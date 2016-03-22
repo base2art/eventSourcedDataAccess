@@ -21,8 +21,8 @@ public class GitReader<Id> {
         this.idType = idType;
     }
 
-    public File getCatalog() throws DataAccessWriterException {
-        return this.container.getCatalog();
+    public File getCatalog(boolean allowDirtyReads) throws DataAccessWriterException {
+        return this.container.getCatalog(allowDirtyReads);
     }
 
     public Id parseId(final String id) {

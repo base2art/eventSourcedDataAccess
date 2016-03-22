@@ -1,16 +1,13 @@
 package com.base2art.eventSourcedDataAccess.git;
 
 import com.base2art.eventSourcedDataAccess.DataAccessWriterException;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.function.Function;
 
-public class GitContainer<Id> {
+import static com.base2art.eventSourcedDataAccess.git.Util.getWorkingDir;
 
+public class GitContainer<Id> {
 
     private final GitDataAccessConfiguration config;
 
@@ -18,22 +15,23 @@ public class GitContainer<Id> {
 
     private final Function<Id, String> idToContainerMap;
 
-    public GitContainer(final GitDataAccessConfiguration config, final String catalogType, final Function<Id, String> idToContainerMap) {
+    private final GitMessageQueue messageQueue;
+
+    public GitContainer(
+            final GitDataAccessConfiguration config,
+            final GitMessageQueue messageQueue,
+            final String catalogType,
+            final Function<Id, String> idToContainerMap) {
+        this.messageQueue = messageQueue;
         this.config = config;
         this.catalogType = catalogType;
         this.idToContainerMap = idToContainerMap;
     }
 
-    public File getWorkingDir() {
-
-        return new File(config.getBasePath(), config.getName());
-    }
-
-
     public File get(final Id id, final boolean createIfNotExist)
             throws DataAccessWriterException {
 
-        File catalog = getCatalog();
+        File catalog = getCatalog(true);
 
         File objectContainer = new File(catalog, this.idToContainerMap.apply(id));
         if (!objectContainer.exists()) {
@@ -46,30 +44,6 @@ public class GitContainer<Id> {
         }
 
         return objectContainer;
-    }
-
-    public String getGitRepo() {
-        return this.config.getGitRepo();
-    }
-
-    public String getCommitMessage() {
-        return this.config.getCommitMessage();
-    }
-
-    public String getCommitUser() {
-        return this.config.getCommitUser();
-    }
-
-    public String getCommitEmail() {
-        return this.config.getCommitEmail();
-    }
-
-    public String getUsername() {
-        return this.config.getUsername();
-    }
-
-    public String getPassword() {
-        return this.config.getPassword();
     }
 
     public boolean hasObject(final Id id) {
@@ -85,51 +59,41 @@ public class GitContainer<Id> {
         }
     }
 
-    protected final void ensureUpdated() {
+    public void commit() {
 
-        final File workingDir = getWorkingDir();
-        if (!workingDir.exists()) {
+        messageQueue.addMessage(MessageType.Commit);
+    }
 
-            try (Git cloneResult = Git.cloneRepository()
-                                      .setURI(config.getGitRepo())
-                                      .setDirectory(workingDir)
-                                      .setCloneAllBranches(true)
-                                      .setCredentialsProvider(new UsernamePasswordCredentialsProvider(config.getUsername(), config.getPassword()))
-                                      .call()) {
-            }
-            catch (GitAPIException e) {
-                throw new RuntimeException(e);
-            }
-        }
+    public void pushAsync() {
 
-        if (!config.isLocal()) {
+        messageQueue.addMessage(MessageType.Push);
+    }
 
-            try {
-                Git.open(workingDir)
-                   .pull()
-                   .call();
-            }
-            catch (GitAPIException | IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+    public void ensureUpdated() {
+
+        messageQueue.pushMessageNow(MessageType.Push);
     }
 
     public final void ensureUpdatedAsync() {
-        new Thread(this::ensureUpdated).start();
+        messageQueue.addMessage(MessageType.Pull);
     }
 
-    protected File getCatalog() throws DataAccessWriterException {
+    protected File getCatalog(boolean allowDirtyReads) throws DataAccessWriterException {
 
-
-        File catalog = new File(getWorkingDir(), catalogType);
+        File catalog = new File(getWorkingDir(this.config), catalogType);
         if (!catalog.exists()) {
 
             if (!catalog.getParentFile().exists()) {
                 catalog.getParentFile().mkdirs();
             }
 
-            this.ensureUpdated();
+            if (allowDirtyReads) {
+                this.ensureUpdatedAsync();
+            }
+            else {
+                this.ensureUpdated();
+            }
+
             if (!catalog.exists()) {
                 boolean created = catalog.mkdir();
                 if (!created) {

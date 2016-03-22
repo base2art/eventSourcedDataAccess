@@ -33,4 +33,6 @@ public class GitDataAccessConfiguration {
     private final String commitMessage;
 
     private final boolean isLocal;
+
+    private final boolean isDebug;
 }
